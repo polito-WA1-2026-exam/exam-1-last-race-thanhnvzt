@@ -1,7 +1,19 @@
-export async function getUserByEmail() {
-  throw new Error('getUserByEmail is not implemented yet');
+import { openDatabase } from '../../db/connection.js';
+
+export async function getUserByUsername(username) {
+  const db = openDatabase();
+  try {
+    return await db.get('SELECT * FROM users WHERE username = ?', [username]);
+  } finally {
+    await db.close();
+  }
 }
 
-export async function getUserById() {
-  throw new Error('getUserById is not implemented yet');
+export async function getUserById(id) {
+  const db = openDatabase();
+  try {
+    return await db.get('SELECT * FROM users WHERE id = ?', [id]);
+  } finally {
+    await db.close();
+  }
 }

@@ -1,3 +1,6 @@
+import { listRanking } from './ranking.dao.js';
+import { mapRanking } from './ranking.mapper.js';
+
 export async function getRanking() {
-  throw new Error('getRanking is not implemented yet');
+  return { ranking: mapRanking(await listRanking()) };
 }

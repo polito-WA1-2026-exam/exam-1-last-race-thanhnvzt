@@ -5,7 +5,7 @@ import { useAuth } from '../../context/useAuth.js';
 import { ErrorBanner } from '../../components/feedback/ErrorBanner.jsx';
 
 export function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -19,7 +19,7 @@ export function LoginPage() {
     setSubmitting(true);
 
     try {
-      const user = await authApi.login({ email, password });
+      const user = await authApi.login({ username, password });
       setUser(user);
       navigate(location.state?.from?.pathname || '/setup', { replace: true });
     } catch (err) {
@@ -34,11 +34,11 @@ export function LoginPage() {
       <h1>Login</h1>
       <form className="form-stack" onSubmit={handleSubmit}>
         <label>
-          Email
+          Username
           <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            type="text"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
           />
         </label>
         <label>

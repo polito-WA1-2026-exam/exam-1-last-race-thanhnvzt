@@ -1,3 +1,6 @@
+import { listNetworkForSetup } from './network.dao.js';
+import { mapSetupNetwork } from './network.mapper.js';
+
 export async function getSetupNetwork() {
-  throw new Error('getSetupNetwork is not implemented yet');
+  return mapSetupNetwork(await listNetworkForSetup());
 }

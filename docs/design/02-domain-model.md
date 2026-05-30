@@ -11,7 +11,7 @@ implemented in SQLite, Express, and React. See also
 A registered player who can log in and play games.
 
 - `id`: stable primary key.
-- `email`: unique login identifier.
+- `username`: unique login identifier.
 - `name`: display name used in the ranking.
 - `passwordHash`: salted encrypted password hash.
 - `salt`: salt used for password verification.

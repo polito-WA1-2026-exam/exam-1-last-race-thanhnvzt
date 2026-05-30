@@ -2,7 +2,7 @@ export function toSafeUser(row) {
   if (!row) return null;
   return {
     id: row.id,
-    email: row.email,
+    username: row.username,
     name: row.name,
   };
 }

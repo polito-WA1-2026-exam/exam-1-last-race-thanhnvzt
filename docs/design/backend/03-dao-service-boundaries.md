@@ -37,7 +37,7 @@ Example DAO groups inside feature folders:
 
 ### `features/auth/users.dao.js`
 
-- `getUserByEmail(email)`
+- `getUserByUsername(username)`
 - `getUserById(id)`
 
 ### `features/network/network.dao.js`

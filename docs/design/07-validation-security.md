@@ -67,7 +67,7 @@ checks for game-specific resources.
 
 ### Login Body
 
-- `email` must be a non-empty string.
+- `username` must be a non-empty string.
 - `password` must be a non-empty string.
 - Invalid credentials return `401` with a generic message.
 

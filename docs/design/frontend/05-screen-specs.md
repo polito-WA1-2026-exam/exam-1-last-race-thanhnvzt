@@ -48,7 +48,7 @@ Purpose:
 Layout:
 
 - centered form panel, max width about 420px;
-- email and password labels;
+- username and password labels;
 - submit button with loading state;
 - controlled error message for invalid credentials.
 
@@ -156,4 +156,3 @@ UI details:
 - sort descending by score;
 - rank indicators are text/numbers, not only colors;
 - current user row may be highlighted if easy to implement.
-

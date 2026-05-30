@@ -13,7 +13,7 @@ Validate at route boundaries:
 - required body fields exist;
 - `segmentIds` is an array;
 - every segment id is an integer;
-- login body contains non-empty email and password.
+- login body contains non-empty username and password.
 
 ### Business Validation
 
@@ -30,7 +30,7 @@ Validate in services:
 
 Validate with SQLite constraints:
 
-- unique email;
+- unique username;
 - unique station and line names;
 - valid event effect range;
 - valid game status values;

@@ -25,7 +25,7 @@ Context unless a future feature truly needs it.
 | `ExecutionPage` | `steps`, `currentStepIndex`, `playbackDone` | route state or `gameApi.getGameResult` |
 | `ResultPage` | `result`, `loading`, `error` | `gameApi.getGameResult` |
 | `RankingPage` | `ranking`, `loading`, `error` | `rankingApi.getRanking` |
-| `LoginPage` | `email`, `password`, `submitting`, `error` | controlled form |
+| `LoginPage` | `username`, `password`, `submitting`, `error` | controlled form |
 
 ## Derived Values
 

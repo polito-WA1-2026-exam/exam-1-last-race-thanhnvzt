@@ -23,7 +23,7 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  email TEXT NOT NULL UNIQUE,
+  username TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
   password_hash TEXT NOT NULL,
   salt TEXT NOT NULL
@@ -122,7 +122,7 @@ looking up a segment. This avoids duplicates such as `A-B` and `B-A`.
 
 ### Authentication
 
-- `getUserByEmail(email)`
+- `getUserByUsername(username)`
 - `getUserById(id)`
 
 ### Network
@@ -202,4 +202,3 @@ Seed values should follow [Domain Model](./02-domain-model.md#proposed-seed-netw
 - 9 events.
 - 3 users.
 - historical games for 2 users with positive scores.
-

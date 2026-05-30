@@ -18,7 +18,7 @@ app avoids exposing the network before login.
 ## Phase 1: Login
 
 1. User opens `/login`.
-2. `LoginPage` uses controlled inputs for email and password.
+2. `LoginPage` uses controlled inputs for username and password.
 3. On submit, it calls `API.login`.
 4. `POST /api/sessions` runs Passport local authentication.
 5. Passport verifies the salted password hash.
@@ -34,7 +34,7 @@ Login form submit
 -> POST /api/sessions with credentials: include
 -> Express JSON middleware
 -> Passport local strategy
--> DAO getUserByEmail
+-> DAO getUserByUsername
 -> password verification
 -> session cookie
 -> React AuthContext update

@@ -39,7 +39,7 @@ Expected common status codes:
 
 | Method | Endpoint | Auth | Body | Success | Error cases | DAO/helper |
 | --- | --- | ---: | --- | --- | --- | --- |
-| POST | `/api/sessions` | No | `{ "email": "...", "password": "..." }` | `201` + logged user | `400`, `401`, `500` | Passport local strategy, `getUserByEmail` |
+| POST | `/api/sessions` | No | `{ "username": "...", "password": "..." }` | `201` + logged user | `400`, `401`, `500` | Passport local strategy, `getUserByUsername` |
 | GET | `/api/sessions/current` | Optional | none | `200` + logged user, or `401` | `401`, `500` | Passport session |
 | DELETE | `/api/sessions/current` | Yes | none | `204` | `401`, `500` | `req.logout` |
 
@@ -48,7 +48,7 @@ Logged user response:
 ```json
 {
   "id": 1,
-  "email": "alice@example.com",
+  "username": "user1",
   "name": "Alice"
 }
 ```

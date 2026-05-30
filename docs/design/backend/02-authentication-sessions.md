@@ -7,7 +7,7 @@ feature; users are preloaded in SQLite.
 
 `users` stores:
 
-- `email`;
+- `username`;
 - `name`;
 - `password_hash`;
 - `salt`.
@@ -19,9 +19,9 @@ passwords.
 
 ```txt
 POST /api/sessions
--> validate email/password body
+-> validate username/password body
 -> Passport local strategy
--> usersDao.getUserByEmail(email)
+-> usersDao.getUserByUsername(username)
 -> verify password hash
 -> req.login(user)
 -> serialize user id into session
@@ -33,7 +33,7 @@ Safe user JSON:
 ```json
 {
   "id": 1,
-  "email": "alice@example.com",
+  "username": "user1",
   "name": "Alice"
 }
 ```
