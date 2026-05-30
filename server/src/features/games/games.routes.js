@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middleware/requireAuth.js';
 import { parseIntegerParam } from '../../middleware/validateRequest.js';
-import { NotImplementedError } from '../../shared/errors.js';
+import { HttpError, NotImplementedError } from '../../shared/errors.js';
 import * as gamesService from './games.service.js';
 
 const router = Router();
@@ -25,8 +25,27 @@ router.get('/:gameId/planning', requireAuth, async (req, res, next) => {
   }
 });
 
-router.post('/:gameId/route', requireAuth, (req, res, next) => {
-  next(new NotImplementedError('Route submission'));
+function parseSegmentIds(body) {
+  if (!Array.isArray(body?.segmentIds)) {
+    throw new HttpError(422, 'segmentIds must be an array');
+  }
+
+  if (!body.segmentIds.every((segmentId) => Number.isInteger(segmentId))) {
+    throw new HttpError(422, 'segmentIds must contain only integers');
+  }
+
+  return body.segmentIds;
+}
+
+router.post('/:gameId/route', requireAuth, async (req, res, next) => {
+  try {
+    const gameId = parseIntegerParam(req.params.gameId, 'gameId');
+    const segmentIds = parseSegmentIds(req.body);
+    const result = await gamesService.submitRoute(gameId, req.user.id, segmentIds);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get('/:gameId/result', requireAuth, (req, res, next) => {
