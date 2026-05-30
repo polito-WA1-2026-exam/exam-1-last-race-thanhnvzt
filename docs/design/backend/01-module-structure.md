@@ -127,7 +127,8 @@ Configuration modules keep constants out of feature code:
 
 - `corsConfig.js`: allowed React origin and credentials flag;
 - `sessionConfig.js`: session secret, cookie options, resave settings;
-- `constants.js`: port, database path, planning duration, initial coins.
+- `constants.js`: port, database path, planning duration, initial coins,
+  planning tolerance seconds.
 
 ### `db/`
 

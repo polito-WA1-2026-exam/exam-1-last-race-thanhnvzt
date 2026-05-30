@@ -88,13 +88,18 @@ The server stores `planningDeadline` and enforces it during submission. The
 client receives `serverNow` for display synchronization, but the backend compares
 against server time.
 
-Recommended strict behavior:
+Implemented deadline behavior:
 
 - before or at deadline: validate and execute normally;
-- after deadline: mark the game `expired` with score 0.
+- after deadline but within the configured tolerance window: validate and execute
+  normally, treating the request as a delayed timeout/manual submission;
+- after `planningDeadline + PLANING_TOLERANCE_SECONDS`: mark the game `expired`
+  with score 0.
 
-If a small grace window is added, it must be documented and implemented only on
-the server.
+`PLANING_TOLERANCE_SECONDS` defaults to `2`. The tolerance window exists only to
+absorb HTTP/network scheduling delay. It must be enforced on the server, must
+not be shown as extra player time in the countdown, and must not allow the
+client to keep accepting edits after the visible 90-second timer reaches zero.
 
 ## Invalid Route Result
 

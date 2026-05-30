@@ -99,7 +99,9 @@ Return `422` for malformed route payloads that cannot be processed. Return
 | Line switch at non-interchange station | invalid, score 0 |
 | Line switch at valid interchange station | allowed |
 | Same physical path with reverse direction | allowed if sequence starts at assigned start |
-| Submission after server deadline | expired or invalid, score 0 |
+| Submission at or before server deadline | validate route normally |
+| Submission within configured tolerance after server deadline | validate route normally; tolerance only covers transport delay |
+| Submission after `planningDeadline + PLANING_TOLERANCE_SECONDS` | expired, score 0 |
 
 ## Score Rules
 
@@ -143,4 +145,3 @@ Frontend:
 - disable submit while a submission is in progress;
 - avoid duplicate route submissions;
 - render empty ranking gracefully.
-

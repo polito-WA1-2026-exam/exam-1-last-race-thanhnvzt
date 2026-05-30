@@ -83,9 +83,13 @@ PORT=3001
 CLIENT_ORIGIN=http://localhost:5173
 SESSION_SECRET=development-secret-replace-later
 DATABASE_PATH=./db.sqlite
+PLANING_TOLERANCE_SECONDS=2
 ```
 
 Defaults may be provided for development, but secrets should be configurable.
+`PLANING_TOLERANCE_SECONDS` is not secret; it controls the backend-only tolerance
+for delayed route submissions. The default is `2` seconds, but deployments may
+configure a different value.
 
 ## CORS
 

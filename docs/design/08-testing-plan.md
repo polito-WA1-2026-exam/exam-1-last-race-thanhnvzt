@@ -56,6 +56,8 @@ Expected:
 | Timer counts down from server deadline | Around 90 seconds at phase start. |
 | Manual submit | Calls route submission endpoint once. |
 | Timeout submit | Automatically submits current route. |
+| Submission arrives within configured tolerance | Backend validates the submitted route normally. |
+| Submission arrives after tolerance | Backend marks the game expired with score 0. |
 | Duplicate submit click | Second click is disabled or ignored. |
 
 ## Route Validation Tests
@@ -105,4 +107,3 @@ Use browser dev tools or a REST client:
 - malformed payloads return `400` or `422`;
 - server does not expose stack traces;
 - cookies are sent only when `credentials: 'include'` is used.
-

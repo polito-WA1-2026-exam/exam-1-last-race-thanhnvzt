@@ -33,7 +33,7 @@ Design implications:
 | Minimum start-destination distance | 3 stops | 3 | `[PLACEHOLDER] 6` | Minimum fixed by exam; max should be tested if assignments feel too hard. |
 | Event effect | -4 to +4 | -4 | +4 | Fixed range by exam. |
 | Low-time warning threshold | `[PLACEHOLDER] 15s` | 10s | 20s | UI tuning; should create urgency without panic. |
-| Deadline grace window | `[PLACEHOLDER] 0s` | 0s | 2s | Prefer 0s for strict server authority unless testing shows network delay issues. |
+| Deadline tolerance window | configurable, default 2s | - | - | Server-only tolerance for delayed timeout/manual submissions; configured as `PLANING_TOLERANCE_SECONDS` and not visible extra planning time. |
 | Event duplicate policy | `[PLACEHOLDER] allowed` | - | - | Allowing duplicates keeps implementation simple; test if repetition feels poor. |
 | Ranking tie-break | `[PLACEHOLDER] name ascending` | - | - | Deterministic and explainable. |
 

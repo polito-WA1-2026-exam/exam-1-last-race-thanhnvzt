@@ -157,11 +157,14 @@ remainingMs = Date.parse(planningDeadline) - (Date.now() + serverOffsetMs)
 When route submission arrives:
 
 - if `submittedAt` is before or equal to `planningDeadline`, process normally;
-- if it arrives after the deadline because of delay, the server may still accept
-  it only if the app design intentionally allows small clock drift;
-- recommended strict rule: after deadline, mark as `expired` but process the
-  route built up to that point as the client submitted it.
+- if it arrives after the deadline but within the configured tolerance window,
+  process normally to protect honest submissions delayed by HTTP or browser
+  scheduling;
+- if it arrives after `planningDeadline + PLANING_TOLERANCE_SECONDS`, mark the
+  game `expired` with score 0.
 
 The exam says timeout automatically ends planning with the route built so far.
 That means the client must submit at zero. The server deadline remains the
-authority in case of manipulated clients.
+authority in case of manipulated clients. `PLANING_TOLERANCE_SECONDS` defaults to
+`2`; it is not extra visible planning time. Once the countdown reaches zero, the
+client disables route editing and sends the current route.

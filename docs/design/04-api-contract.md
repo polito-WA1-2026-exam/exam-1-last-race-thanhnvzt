@@ -146,7 +146,11 @@ names but no connecting lines.
 
 `serverNow` is returned with planning responses so the client can compensate for
 small clock differences while rendering the countdown. The server still uses the
-stored `planningDeadline` as the authority when the route is submitted.
+stored `planningDeadline` as the authority when the route is submitted. To avoid
+penalizing honest timeout/manual submissions delayed by HTTP or browser
+scheduling, the backend accepts submissions received within the configured
+`PLANING_TOLERANCE_SECONDS` value after `planningDeadline`; later submissions expire
+the game with score 0. The default is `2` seconds.
 
 ### Submit Route Request
 
