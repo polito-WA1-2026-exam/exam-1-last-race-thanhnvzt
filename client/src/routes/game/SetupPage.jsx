@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as gameApi from '../../api/gameApi.js';
 import { NetworkMap } from '../../components/game/NetworkMap.jsx';
 import { LoadingPanel } from '../../components/feedback/LoadingPanel.jsx';
 import { ErrorBanner } from '../../components/feedback/ErrorBanner.jsx';
 
 export function SetupPage() {
+  const navigate = useNavigate();
   const [network, setNetwork] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [startError, setStartError] = useState(null);
+  const [startingGame, setStartingGame] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -37,9 +41,17 @@ export function SetupPage() {
     };
   }, []);
 
-  function handleStartPlaceholder() {
-    console.log('Start challenge placeholder clicked. Game creation API will be wired in Phase 5.');
-    alert('Transit challenge ready! (Game creation is implemented in Phase 5)');
+  async function handleStartGame() {
+    try {
+      setStartingGame(true);
+      setStartError(null);
+      const game = await gameApi.createGame();
+      navigate(`/game/${game.gameId}/planning`);
+    } catch (err) {
+      setStartError(err.message || 'Failed to start game.');
+    } finally {
+      setStartingGame(false);
+    }
   }
 
   if (loading) {
@@ -102,10 +114,12 @@ export function SetupPage() {
             className="primary-button"
             style={{ width: '100%', padding: '12px', fontSize: '1rem' }}
             type="button"
-            onClick={handleStartPlaceholder}
+            onClick={handleStartGame}
+            disabled={startingGame}
           >
-            Start Challenge
+            {startingGame ? 'Starting...' : 'Start Challenge'}
           </button>
+          <ErrorBanner message={startError} />
         </div>
       </div>
     </section>
