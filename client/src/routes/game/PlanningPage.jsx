@@ -144,11 +144,7 @@ export function PlanningPage() {
         );
 
         const result = await gameApi.submitRoute(gameId, selectedSegmentIds);
-        if (result.validRoute) {
-          navigate(`/game/${gameId}/execution`, { state: { result } });
-        } else {
-          navigate(`/game/${gameId}/result`, { state: { result } });
-        }
+        navigate(`/game/${gameId}/result`, { state: { result } });
       } catch (err) {
         if (err.status === 501) {
           setSubmitNotice(null);

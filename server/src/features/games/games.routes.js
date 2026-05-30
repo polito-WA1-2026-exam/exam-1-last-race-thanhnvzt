@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middleware/requireAuth.js';
 import { parseIntegerParam } from '../../middleware/validateRequest.js';
-import { HttpError, NotImplementedError } from '../../shared/errors.js';
+import { HttpError } from '../../shared/errors.js';
 import * as gamesService from './games.service.js';
 
 const router = Router();
@@ -48,8 +48,14 @@ router.post('/:gameId/route', requireAuth, async (req, res, next) => {
   }
 });
 
-router.get('/:gameId/result', requireAuth, (req, res, next) => {
-  next(new NotImplementedError('Game result'));
+router.get('/:gameId/result', requireAuth, async (req, res, next) => {
+  try {
+    const gameId = parseIntegerParam(req.params.gameId, 'gameId');
+    const result = await gamesService.getGameResult(gameId, req.user.id);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;

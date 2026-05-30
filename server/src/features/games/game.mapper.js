@@ -49,6 +49,8 @@ export function mapInvalidRouteResult({ game, status, invalidReason }) {
     status,
     validRoute: false,
     invalidReason,
+    startStation: mapGameStation(game, 'start'),
+    destinationStation: mapGameStation(game, 'destination'),
     initialCoins: game.initial_coins,
     finalCoins: 0,
     score: 0,
@@ -57,14 +59,26 @@ export function mapInvalidRouteResult({ game, status, invalidReason }) {
   };
 }
 
-export function mapValidRouteResult({ game, scoredSteps, finalCoins, score }) {
+function mapRouteStation(station) {
+  return {
+    id: station.id,
+    name: station.name,
+    x: station.x,
+    y: station.y,
+  };
+}
+
+export function mapValidRouteResult({ game, stations, scoredSteps, finalCoins, score }) {
   return {
     gameId: game.id,
     status: 'executed',
     validRoute: true,
+    startStation: mapGameStation(game, 'start'),
+    destinationStation: mapGameStation(game, 'destination'),
     initialCoins: game.initial_coins,
     finalCoins,
     score,
+    stations,
     resolvedSteps: scoredSteps.map((step) => ({
       index: step.index,
       segmentId: step.segmentId,
@@ -74,14 +88,8 @@ export function mapValidRouteResult({ game, scoredSteps, finalCoins, score }) {
     })),
     steps: scoredSteps.map((step) => ({
       index: step.index,
-      fromStation: {
-        id: step.fromStation.id,
-        name: step.fromStation.name,
-      },
-      toStation: {
-        id: step.toStation.id,
-        name: step.toStation.name,
-      },
+      fromStation: mapRouteStation(step.fromStation),
+      toStation: mapRouteStation(step.toStation),
       line: {
         id: step.line.id,
         name: step.line.name,
@@ -93,5 +101,44 @@ export function mapValidRouteResult({ game, scoredSteps, finalCoins, score }) {
       },
       coinsAfterStep: step.coinsAfterStep,
     })),
+  };
+}
+
+export function mapStoredGameResult({ game, stations, steps }) {
+  if (game.status === 'invalid' || game.status === 'expired') {
+    return {
+      gameId: game.id,
+      status: game.status,
+      validRoute: false,
+      invalidReason: game.invalid_reason,
+      startStation: mapGameStation(game, 'start'),
+      destinationStation: mapGameStation(game, 'destination'),
+      initialCoins: game.initial_coins,
+      finalCoins: game.final_coins,
+      score: game.score,
+      stations: [],
+      resolvedSteps: [],
+      steps: [],
+    };
+  }
+
+  return {
+    gameId: game.id,
+    status: game.status,
+    validRoute: game.valid_route === 1,
+    invalidReason: game.invalid_reason,
+    startStation: mapGameStation(game, 'start'),
+    destinationStation: mapGameStation(game, 'destination'),
+    initialCoins: game.initial_coins,
+    finalCoins: game.final_coins,
+    score: game.score,
+    stations,
+    resolvedSteps: steps.map((step) => ({
+      index: step.index,
+      fromStationId: step.fromStation.id,
+      toStationId: step.toStation.id,
+      lineId: step.line.id,
+    })),
+    steps,
   };
 }

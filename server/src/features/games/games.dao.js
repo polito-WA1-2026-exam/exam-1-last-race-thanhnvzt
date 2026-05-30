@@ -106,6 +106,68 @@ export async function getGameById(gameId) {
   }
 }
 
+export async function getResultGameById(gameId) {
+  const db = openDatabase();
+  try {
+    return await db.get(
+      `SELECT
+        g.id,
+        g.user_id,
+        g.status,
+        g.start_station_id,
+        start_station.name AS start_station_name,
+        g.destination_station_id,
+        destination_station.name AS destination_station_name,
+        g.initial_coins,
+        g.final_coins,
+        g.score,
+        g.valid_route,
+        g.invalid_reason
+      FROM games g
+      JOIN stations start_station ON start_station.id = g.start_station_id
+      JOIN stations destination_station ON destination_station.id = g.destination_station_id
+      WHERE g.id = ?`,
+      [gameId],
+    );
+  } finally {
+    await db.close();
+  }
+}
+
+export async function listGameSteps(gameId) {
+  const db = openDatabase();
+  try {
+    return await db.all(
+      `SELECT
+        gs.step_index,
+        from_station.id AS from_station_id,
+        from_station.name AS from_station_name,
+        from_station.x AS from_station_x,
+        from_station.y AS from_station_y,
+        to_station.id AS to_station_id,
+        to_station.name AS to_station_name,
+        to_station.x AS to_station_x,
+        to_station.y AS to_station_y,
+        ml.id AS line_id,
+        ml.name AS line_name,
+        ml.color AS line_color,
+        e.description AS event_description,
+        e.effect AS event_effect,
+        gs.coins_after_step
+      FROM game_steps gs
+      JOIN stations from_station ON from_station.id = gs.from_station_id
+      JOIN stations to_station ON to_station.id = gs.to_station_id
+      JOIN metro_lines ml ON ml.id = gs.line_id
+      JOIN events e ON e.id = gs.event_id
+      WHERE gs.game_id = ?
+      ORDER BY gs.step_index`,
+      [gameId],
+    );
+  } finally {
+    await db.close();
+  }
+}
+
 export async function getGameByIdInTransaction(db, gameId) {
   return await db.get(
     `SELECT
@@ -193,7 +255,7 @@ export async function listStationLineIdsInTransaction(db) {
 }
 
 export async function listStationsInTransaction(db) {
-  return await db.all('SELECT id, name FROM stations ORDER BY id');
+  return await db.all('SELECT id, name, x, y FROM stations ORDER BY id');
 }
 
 export async function listEventsInTransaction(db) {

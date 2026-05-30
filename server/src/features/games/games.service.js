@@ -8,8 +8,10 @@ import { addSeconds, nowIso } from '../../shared/time.js';
 import {
   getGameById,
   getGameByIdInTransaction,
+  getResultGameById,
   insertPlanningGame,
   listEventsInTransaction,
+  listGameSteps,
   listRouteSegmentsInTransaction,
   listStationLineIdsInTransaction,
   listStationsInTransaction,
@@ -23,6 +25,7 @@ import {
   mapInvalidRouteResult,
   mapPlanningData,
   mapPlanningGame,
+  mapStoredGameResult,
   mapValidRouteResult,
 } from './game.mapper.js';
 import { pickRandomStationPair } from './graph.service.js';
@@ -168,9 +171,65 @@ export async function submitRoute(gameId, userId, segmentIds) {
 
     return mapValidRouteResult({
       game,
+      stations,
       finalCoins: scoring.finalCoins,
       score: scoring.score,
       scoredSteps: enrichScoredSteps(scoring.scoredSteps, stationsById, linesById),
     });
+  });
+}
+
+function mapStepRow(row) {
+  return {
+    index: row.step_index,
+    fromStation: {
+      id: row.from_station_id,
+      name: row.from_station_name,
+      x: row.from_station_x,
+      y: row.from_station_y,
+    },
+    toStation: {
+      id: row.to_station_id,
+      name: row.to_station_name,
+      x: row.to_station_x,
+      y: row.to_station_y,
+    },
+    line: {
+      id: row.line_id,
+      name: row.line_name,
+      color: row.line_color,
+    },
+    event: {
+      description: row.event_description,
+      effect: row.event_effect,
+    },
+    coinsAfterStep: row.coins_after_step,
+  };
+}
+
+export async function getGameResult(gameId, userId) {
+  const game = await getResultGameById(gameId);
+
+  if (!game) {
+    throw new HttpError(404, 'Game not found');
+  }
+
+  if (game.user_id !== userId) {
+    throw new HttpError(403, 'Game belongs to another user');
+  }
+
+  if (game.status === 'planning') {
+    throw new HttpError(409, 'Game is not finished yet');
+  }
+
+  const [steps, stations] = await Promise.all([
+    game.status === 'executed' ? listGameSteps(gameId) : [],
+    game.status === 'executed' ? listStationsForPlanning() : [],
+  ]);
+
+  return mapStoredGameResult({
+    game,
+    stations,
+    steps: steps.map(mapStepRow),
   });
 }
