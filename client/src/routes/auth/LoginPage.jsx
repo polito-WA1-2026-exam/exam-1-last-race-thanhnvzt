@@ -37,6 +37,8 @@ export function LoginPage() {
           Username
           <input
             type="text"
+            autoComplete="username"
+            required
             value={username}
             onChange={(event) => setUsername(event.target.value)}
           />
@@ -45,6 +47,8 @@ export function LoginPage() {
           Password
           <input
             type="password"
+            autoComplete="current-password"
+            required
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />

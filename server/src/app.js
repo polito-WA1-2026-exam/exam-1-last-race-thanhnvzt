@@ -4,6 +4,7 @@ import session from 'express-session';
 import passport from 'passport';
 import { corsConfig } from './config/corsConfig.js';
 import { sessionConfig } from './config/sessionConfig.js';
+import './features/auth/passport.js';
 import authRoutes from './features/auth/auth.routes.js';
 import networkRoutes from './features/network/network.routes.js';
 import gamesRoutes from './features/games/games.routes.js';
