@@ -77,12 +77,12 @@ Important distinction:
 ## Phase 4A: Valid Route Execution
 
 1. Server reconstructs the route direction from the assigned start.
-2. Server validates station continuity and line-change rules.
+2. Server validates station continuity and line-change rules, then resolves one
+   valid `lineId` for each directed step.
 3. Server starts from 20 coins.
-4. For each step:
+4. For each resolved step:
    - choose one random event from `events`;
    - apply the event effect;
-   - resolve the line used for the step;
    - insert a `game_steps` row.
 5. Server updates the game:
    - `status = 'executed'`;

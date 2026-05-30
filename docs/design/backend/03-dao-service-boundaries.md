@@ -89,13 +89,14 @@ Responsibilities:
 - verify consecutive continuity;
 - verify final destination;
 - verify line changes only at interchange stations;
+- resolve one valid `lineId` assignment for every directed step;
 - return a validation result object, not an HTTP response.
 
 ### `features/games/scoring.service.js`
 
 Responsibilities:
 
-- select random events for each valid step;
+- select random events for each resolved valid step;
 - apply event effects from 20 starting coins;
 - clamp score to minimum 0;
 - build step result objects.
@@ -121,7 +122,17 @@ Services should return plain results:
   initialCoins: 20,
   finalCoins: 18,
   score: 18,
-  steps: []
+  steps: [
+    {
+      index: 0,
+      segmentId: 5,
+      fromStationId: 3,
+      toStationId: 7,
+      lineId: 2,
+      eventId: 4,
+      coinsAfterStep: 18
+    }
+  ]
 }
 ```
 

@@ -199,8 +199,13 @@ Recommended server algorithm:
      an interchange station served by both the previous line and the new line.
 7. Accept the route if at least one line assignment reaches the final step.
 
-This is easier to defend than hardcoding line choices in the client, and it
-handles segments that may be served by multiple lines.
+The validation result must include the resolved line assignment, not only a
+boolean. For a valid route, return ordered directed steps with `segmentId`,
+`fromStationId`, `toStationId`, and the chosen `lineId` for each step. Scoring
+and persistence then consume those resolved steps when inserting `game_steps`
+and building the execution response. This is easier to defend than hardcoding
+line choices in the client, and it handles segments that may be served by
+multiple lines.
 
 ## User Stories
 
@@ -230,4 +235,3 @@ handles segments that may be served by multiple lines.
 | View own result | No | No | Yes |
 | View ranking | No | Yes | Yes |
 | Access another user's game | No | No | No |
-

@@ -161,7 +161,10 @@ the game with score 0. The default is `2` seconds.
 ```
 
 The server reconstructs the directed route from the assigned start. If the next
-selected segment does not touch the current station, the route is invalid.
+selected segment does not touch the current station, the route is invalid. For a
+valid route, backend validation also resolves the `lineId` used for every step;
+the execution response exposes that resolved line and the same value is stored
+in `game_steps.line_id`.
 
 ### Valid Route Response
 

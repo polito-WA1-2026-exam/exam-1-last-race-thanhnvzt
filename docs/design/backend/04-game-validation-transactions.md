@@ -29,9 +29,9 @@ submitRoute(gameId, userId, selectedSegmentIds)
 -> compare server now with planningDeadline
 -> load selected segments and serving lines
 -> reconstruct directed route
--> validate route rules
+-> validate route rules and resolve line id for each directed step
 -> if invalid or expired: update game with score 0
--> if valid: choose events, insert game steps, update score
+-> if valid: choose events for resolved steps, insert game steps, update score
 -> commit transaction
 -> return result object
 ```
@@ -82,6 +82,25 @@ for each next step:
 The route is valid only if the final step leaves at least one possible line
 assignment.
 
+For a valid route, the validation service must choose one valid line assignment
+and return it as `resolvedSteps`. Each resolved step contains:
+
+```js
+{
+  index,
+  segmentId,
+  fromStationId,
+  toStationId,
+  lineId
+}
+```
+
+If multiple line assignments are valid, choose deterministically from the
+remaining possible assignments, for example the lowest `lineId` at the final
+step and the compatible preceding lines. The important rule is that scoring and
+`game_steps` insertion receive already-resolved `lineId` values; they should not
+re-run line-change validation or guess a line later.
+
 ## Deadline Rule
 
 The server stores `planningDeadline` and enforces it during submission. The
@@ -117,9 +136,10 @@ Invalid or expired games:
 Valid games:
 
 - start from 20 coins;
-- select one random event per step;
+- select one random event per resolved step;
 - apply event effects in order;
-- insert one `game_steps` row per step;
+- insert one `game_steps` row per resolved step, including its resolved
+  `line_id`;
 - set raw `final_coins`;
 - set `score = Math.max(finalCoins, 0)`;
 - set `valid_route = 1`;
