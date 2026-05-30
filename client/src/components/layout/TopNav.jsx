@@ -18,6 +18,7 @@ export function TopNav() {
         Last Race
       </Link>
       <nav className="nav-links" aria-label="Primary navigation">
+        <NavLink to="/" end>Home</NavLink>
         {user ? (
           <>
             <NavLink to="/setup">Setup</NavLink>

@@ -15,6 +15,7 @@ map-first, phase-oriented, and optimized for route planning under time pressure.
 4. [State and Data Flow](./04-state-data-flow.md)
 5. [Screen Specifications](./05-screen-specs.md)
 6. [Component Contracts](./06-component-contracts.md)
+7. [Instructions Screen Design](./07-instructions-screen.md)
 
 ## Design Principles
 

@@ -114,3 +114,182 @@
 .error-message {
   color: var(--color-danger);
 }
+
+.instructions-page {
+  display: grid;
+  gap: 18px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.instructions-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.instructions-copy,
+.signal-board,
+.rule-card,
+.instruction-panel {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.instructions-copy {
+  padding: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--color-accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.instructions-copy h1 {
+  margin: 0;
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+.lead {
+  max-width: 680px;
+  margin: 16px 0 0;
+  color: var(--color-muted);
+  font-size: 1.15rem;
+  line-height: 1.55;
+}
+
+.instruction-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.primary-button {
+  text-decoration: none;
+}
+
+.signal-board {
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+  padding: 22px;
+  background:
+    linear-gradient(180deg, rgba(31, 111, 139, 0.08), transparent 52%),
+    var(--color-surface);
+}
+
+.signal-board-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--color-muted);
+}
+
+.signal-board-header strong {
+  color: var(--color-primary-strong);
+}
+
+.signal-track {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.signal-track::before {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  content: '';
+  height: 3px;
+  background: var(--color-border);
+}
+
+.signal-track span {
+  grid-row: 1;
+  width: 18px;
+  height: 18px;
+  border: 3px solid var(--color-primary);
+  border-radius: 50%;
+  background: var(--color-surface);
+  z-index: 1;
+}
+
+.signal-board p,
+.instruction-panel p,
+.rule-card p {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.rule-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rule-card {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+}
+
+.rule-card span {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.rule-card strong {
+  color: var(--color-primary);
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.instructions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.instruction-panel {
+  padding: 22px;
+}
+
+.instruction-panel h2 {
+  margin: 0 0 14px;
+}
+
+.instruction-steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 22px;
+}
+
+.instruction-steps li {
+  padding-left: 4px;
+  line-height: 1.45;
+}
+
+@media (max-width: 820px) {
+  .instructions-hero,
+  .instructions-grid,
+  .rule-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .instructions-copy h1 {
+    font-size: 2.2rem;
+  }
+}

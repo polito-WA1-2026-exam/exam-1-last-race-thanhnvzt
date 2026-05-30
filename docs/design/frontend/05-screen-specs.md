@@ -14,6 +14,7 @@ MainContent
 TopNav contents:
 
 - app name: Last Race;
+- home link for all users;
 - setup link for logged users;
 - ranking link for logged users;
 - user name and logout for logged users;
@@ -38,6 +39,10 @@ Layout:
 - compact title and rules panel;
 - "Login to play" action;
 - no decorative full-screen hero.
+
+Detailed design:
+
+- See [Instructions Screen Design](./07-instructions-screen.md).
 
 ## Login Page
 

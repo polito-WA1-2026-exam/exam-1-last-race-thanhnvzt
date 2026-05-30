@@ -12,6 +12,7 @@ UI decisions, route logic, and component contracts easier to review.
 4. [State and Data Flow](./frontend/04-state-data-flow.md)
 5. [Screen Specifications](./frontend/05-screen-specs.md)
 6. [Component Contracts](./frontend/06-component-contracts.md)
+7. [Instructions Screen Design](./frontend/07-instructions-screen.md)
 
 ## Summary
 
@@ -28,4 +29,3 @@ The recommended React organization is feature-oriented. Route-level screens live
 in `client/src/routes/`, reusable UI lives in `client/src/components/`, API calls
 live in `client/src/api/`, and game-specific helpers live in
 `client/src/features/game/`.
-
