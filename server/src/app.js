@@ -2,8 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
+import { DEBUG_MODE } from './config/constants.js';
 import { corsConfig } from './config/corsConfig.js';
 import { sessionConfig } from './config/sessionConfig.js';
+import { mountSwaggerDocs } from './docs/swaggerDocs.js';
 import './features/auth/passport.js';
 import authRoutes from './features/auth/auth.routes.js';
 import networkRoutes from './features/network/network.routes.js';
@@ -23,6 +25,10 @@ app.use(passport.session());
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+
+if (DEBUG_MODE) {
+  mountSwaggerDocs(app);
+}
 
 app.use('/api/sessions', authRoutes);
 app.use('/api/network', networkRoutes);

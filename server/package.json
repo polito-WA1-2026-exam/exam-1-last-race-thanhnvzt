@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "db:reset": "node src/scripts/init-db.js",
+    "debug": "DEBUG_MODE=1 DEBUG_GAME_VALIDATION=1 node index.js",
     "start": "node index.js",
     "test": "node --check index.js"
   },
@@ -17,6 +18,7 @@
     "express-session": "^1.18.2",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "swagger-ui-express": "^5.0.1"
   }
 }

@@ -74,6 +74,44 @@ Server logs should include enough information to debug:
 
 Do not log passwords or session cookies.
 
+Detailed route-validation logs are disabled by default. Enable them only during
+local debugging with `DEBUG_GAME_VALIDATION=1` or `npm run debug`. The output is
+server-side only and uses the `[game-validation]` prefix so route reconstruction,
+line-change decisions, deadline tolerance, and scoring can be inspected without
+changing API responses.
+
+## Debug API Documentation
+
+Swagger UI is available only in debug mode:
+
+```sh
+DEBUG_MODE=1 npm start
+# or
+npm run debug
+```
+
+Then open:
+
+```txt
+http://localhost:3001/docs
+```
+
+The `/docs` route is not mounted during normal `npm start` unless
+`DEBUG_MODE=1` is set. This keeps the exam runtime small and avoids exposing
+debug documentation unintentionally.
+
+Authentication in Swagger uses the same Passport session flow as the React app:
+
+1. Open `/docs`.
+2. Run `POST /api/sessions` with a seeded username/password.
+3. The browser receives the `connect.sid` session cookie.
+4. Protected "Try it out" requests reuse that cookie because Swagger UI is
+   configured to include credentials.
+
+The OpenAPI document also declares `cookieAuth` for protected endpoints so the
+authentication requirement is visible in the UI. The API itself still trusts
+only the real server-side session, not a manually typed token.
+
 ## Runtime Configuration
 
 Recommended environment values:
@@ -84,12 +122,18 @@ CLIENT_ORIGIN=http://localhost:5173
 SESSION_SECRET=development-secret-replace-later
 DATABASE_PATH=./db.sqlite
 PLANING_TOLERANCE_SECONDS=2
+DEBUG_GAME_VALIDATION=0
+DEBUG_MODE=0
 ```
 
 Defaults may be provided for development, but secrets should be configurable.
 `PLANING_TOLERANCE_SECONDS` is not secret; it controls the backend-only tolerance
 for delayed route submissions. The default is `2` seconds, but deployments may
 configure a different value.
+`DEBUG_GAME_VALIDATION` is not secret either, but it should stay off for normal
+runs because it prints detailed game-validation behavior.
+`DEBUG_MODE` enables debug-only tooling such as Swagger UI and should stay off
+for normal submission runs.
 
 ## CORS
 

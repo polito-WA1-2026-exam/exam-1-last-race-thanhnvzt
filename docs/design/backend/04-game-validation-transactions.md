@@ -101,6 +101,38 @@ step and the compatible preceding lines. The important rule is that scoring and
 `game_steps` insertion receive already-resolved `lineId` values; they should not
 re-run line-change validation or guess a line later.
 
+## Debug Validation Logging
+
+Normal server runs should not print detailed validation traces. For local
+debugging, enable validation logging with either:
+
+```sh
+DEBUG_GAME_VALIDATION=1 npm start
+```
+
+or the broader debug shortcut:
+
+```sh
+npm run debug
+```
+
+When enabled, the server logs the validation decision path with a
+`[game-validation]` prefix:
+
+- submitted `segmentIds`;
+- owner/status/deadline checks;
+- tolerance-window deadline decision;
+- selected segment rows and serving line options;
+- directed route reconstruction from the assigned start station;
+- rejected step reasons such as unknown, disconnected, or over-continued route;
+- line-assignment candidates and whether each transition is accepted by same
+  line or interchange;
+- final resolved `lineId` per step for valid routes;
+- scoring input and output after route validation.
+
+These logs are server-only diagnostics. They must not be returned by the API and
+must not include passwords, session cookies, or raw SQL statements.
+
 ## Deadline Rule
 
 The server stores `planningDeadline` and enforces it during submission. The
