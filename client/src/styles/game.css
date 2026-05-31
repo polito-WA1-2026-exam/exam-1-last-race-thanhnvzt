@@ -1,3 +1,7 @@
+.setup-page {
+  max-width: 1200px;
+}
+
 /* Setup Page & Network Map Styles */
 .setup-layout {
   display: grid;
@@ -103,6 +107,12 @@
   line-height: 1.45;
 }
 
+.setup-start-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+}
+
 @media (max-width: 900px) {
   .setup-layout {
     grid-template-columns: 1fr;
@@ -206,6 +216,11 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+.planning-action-controls button:not(.primary-button):hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .planning-action-controls a {
@@ -429,6 +444,10 @@
 .segment-row-selected {
   border-color: var(--color-primary);
   background: rgba(31, 111, 139, 0.1);
+}
+
+.segment-row:hover:not(:disabled) {
+  border-color: var(--color-primary);
 }
 
 @media (max-width: 900px) {
@@ -762,4 +781,16 @@
 
 .ranking-row-current {
   background: rgba(31, 111, 139, 0.08);
+}
+
+@media (max-width: 720px) {
+  .ranking-table th,
+  .ranking-table td {
+    padding: 12px 10px;
+  }
+
+  .ranking-player-cell {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

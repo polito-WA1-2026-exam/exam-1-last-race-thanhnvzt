@@ -68,7 +68,7 @@ export function SetupPage() {
   }
 
   return (
-    <section className="page-panel" style={{ maxWidth: '1200px' }}>
+    <section className="page-panel setup-page">
       <div className="setup-header">
         <h1>Underground Network</h1>
         <p className="status-message">
@@ -111,8 +111,7 @@ export function SetupPage() {
           </div>
 
           <button
-            className="primary-button"
-            style={{ width: '100%', padding: '12px', fontSize: '1rem' }}
+            className="primary-button setup-start-button"
             type="button"
             onClick={handleStartGame}
             disabled={startingGame}

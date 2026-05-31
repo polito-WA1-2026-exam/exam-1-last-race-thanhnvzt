@@ -15,6 +15,7 @@
 }
 
 .brand-link {
+  flex: 0 0 auto;
   font-weight: 700;
   color: var(--color-text);
   text-decoration: none;
@@ -24,6 +25,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .nav-links a,
@@ -43,6 +46,12 @@
   background: transparent;
   cursor: pointer;
   padding: 0;
+}
+
+.link-button:hover,
+.nav-links a:hover,
+.brand-link:hover {
+  color: var(--color-primary);
 }
 
 .main-content {
@@ -98,6 +107,9 @@
 
 .primary-button {
   justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 10px 14px;
   border: 0;
   border-radius: 6px;
@@ -106,6 +118,10 @@
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--color-primary-strong);
 }
 
 .primary-button:disabled {
@@ -119,6 +135,31 @@
 
 .error-message {
   color: var(--color-danger);
+}
+
+.feedback-panel {
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+}
+
+.feedback-message,
+.empty-state {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.feedback-message.status-message,
+.empty-state {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+}
+
+.feedback-message.error-message {
+  border: 1px solid rgba(180, 35, 24, 0.25);
+  background: rgba(254, 242, 242, 0.95);
 }
 
 .eyebrow {
@@ -136,4 +177,27 @@
   color: var(--color-muted);
   font-size: 1.15rem;
   line-height: 1.55;
+}
+
+.login-hint {
+  margin-top: -4px;
+}
+
+@media (max-width: 720px) {
+  .top-nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .nav-links {
+    justify-content: flex-start;
+  }
+
+  .main-content {
+    padding: 16px;
+  }
+
+  .page-panel {
+    padding: 18px;
+  }
 }
