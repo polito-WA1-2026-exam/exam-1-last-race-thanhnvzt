@@ -697,3 +697,69 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Ranking */
+.ranking-page {
+  max-width: 900px;
+}
+
+.ranking-table-wrap {
+  margin-top: 20px;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+}
+
+.ranking-table th,
+.ranking-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.ranking-table th {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ranking-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.ranking-table td:first-child {
+  width: 76px;
+  color: var(--color-primary);
+}
+
+.ranking-table td:nth-child(3),
+.ranking-table td:nth-child(4) {
+  font-weight: 800;
+}
+
+.ranking-player-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ranking-table em {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(21, 128, 61, 0.1);
+  color: var(--color-success);
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.ranking-row-current {
+  background: rgba(31, 111, 139, 0.08);
+}

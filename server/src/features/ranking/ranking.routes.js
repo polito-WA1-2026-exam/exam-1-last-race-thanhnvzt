@@ -1,11 +1,16 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middleware/requireAuth.js';
-import { NotImplementedError } from '../../shared/errors.js';
+import { getRanking } from './ranking.service.js';
 
 const router = Router();
 
-router.get('/', requireAuth, (req, res, next) => {
-  next(new NotImplementedError('Ranking'));
+router.get('/', requireAuth, async (req, res, next) => {
+  try {
+    const ranking = await getRanking();
+    res.json(ranking);
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;
