@@ -234,6 +234,57 @@
   opacity: 0.58;
 }
 
+.route-confirm-modal .modal-content {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(17, 24, 39, 0.28);
+}
+
+.route-confirm-modal .modal-header,
+.route-confirm-modal .modal-footer {
+  border-color: var(--color-border);
+}
+
+.route-confirm-modal .modal-title {
+  color: var(--color-text);
+  font-weight: 800;
+}
+
+.route-confirm-modal .modal-body {
+  display: grid;
+  gap: 14px;
+  color: var(--color-text);
+}
+
+.route-confirm-modal .modal-body p {
+  margin: 0;
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.route-confirm-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-muted);
+}
+
+.route-confirm-summary span {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.route-confirm-summary strong {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+}
+
 .planning-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);

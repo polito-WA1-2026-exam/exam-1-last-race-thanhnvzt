@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as gameApi from '../../api/gameApi.js';
+import { SubmitButton } from '../../components/controls/SubmitButton.jsx';
 import { CountdownTimer } from '../../components/game/CountdownTimer.jsx';
 import { SegmentList } from '../../components/game/SegmentList.jsx';
 import { StationOnlyMap } from '../../components/game/StationOnlyMap.jsx';
@@ -20,6 +23,7 @@ export function PlanningPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [expired, setExpired] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -36,6 +40,7 @@ export function PlanningPage() {
           setSubmitNotice(null);
           setSubmitted(false);
           setExpired(false);
+          setShowSubmitConfirm(false);
           setError(null);
         }
       } catch (err) {
@@ -116,6 +121,7 @@ export function PlanningPage() {
     setRouteWarning(null);
     setSubmitError(null);
     setSubmitNotice(null);
+    setShowSubmitConfirm(false);
   }
 
   const handleSubmitRoute = useCallback(
@@ -136,6 +142,7 @@ export function PlanningPage() {
         setSubmitting(true);
         setSubmitted(true);
         setExpired(true);
+        setShowSubmitConfirm(false);
         setSubmitError(null);
         setSubmitNotice(
           triggeredByTimeout
@@ -162,7 +169,31 @@ export function PlanningPage() {
     [expired, gameId, navigate, selectedSegmentIds, submitted, submitting],
   );
 
+  function handleRequestSubmitRoute() {
+    if (editingDisabled) return;
+
+    setSubmitError(null);
+    setSubmitNotice(null);
+
+    if (selectedSegmentIds.length === 0) {
+      setSubmitError('Select at least one segment before submitting manually.');
+      return;
+    }
+
+    setShowSubmitConfirm(true);
+  }
+
+  function handleCloseSubmitConfirm() {
+    if (submitting) return;
+    setShowSubmitConfirm(false);
+  }
+
+  function handleConfirmSubmitRoute() {
+    handleSubmitRoute();
+  }
+
   const handleTimerExpire = useCallback(() => {
+    setShowSubmitConfirm(false);
     setExpired(true);
     handleSubmitRoute({ triggeredByTimeout: true });
   }, [handleSubmitRoute]);
@@ -212,14 +243,14 @@ export function PlanningPage() {
           >
             Clear
           </button>
-          <button
-            className="primary-button"
+          <SubmitButton
             type="button"
-            onClick={() => handleSubmitRoute()}
+            onClick={handleRequestSubmitRoute}
             disabled={editingDisabled || selectedSegmentIds.length === 0}
+            isSubmitting={submitting}
           >
-            {submitting ? 'Submitting...' : 'Submit'}
-          </button>
+            Submit
+          </SubmitButton>
         </div>
         {(submitNotice || submitError) && (
           <p className={submitError ? 'error-message' : 'status-message'}>
@@ -254,6 +285,44 @@ export function PlanningPage() {
           onToggleSegment={toggleSegment}
         />
       </div>
+
+      <Modal
+        show={showSubmitConfirm}
+        onHide={handleCloseSubmitConfirm}
+        centered
+        backdrop="static"
+        className="route-confirm-modal"
+      >
+        <Modal.Header closeButton={!submitting}>
+          <Modal.Title>Submit route?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            Submit the selected route before the timer expires. After
+            submission, the route cannot be changed.
+          </p>
+          <div className="route-confirm-summary">
+            <span>Selected segments</span>
+            <strong>{selectedSegmentIds.length}</strong>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="outline-secondary"
+            onClick={handleCloseSubmitConfirm}
+            disabled={submitting}
+          >
+            Keep editing
+          </Button>
+          <SubmitButton
+            type="button"
+            onClick={handleConfirmSubmitRoute}
+            isSubmitting={submitting}
+          >
+            Submit
+          </SubmitButton>
+        </Modal.Footer>
+      </Modal>
     </section>
   );
 }

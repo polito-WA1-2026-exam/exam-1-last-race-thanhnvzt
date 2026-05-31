@@ -28,7 +28,7 @@ export function SegmentList({
               disabled={disabled}
             >
               <span>{segment.stationA.name}</span>
-              <span aria-hidden="true">to</span>
+              <span aria-hidden="true">-</span>
               <span>{segment.stationB.name}</span>
             </button>
           );

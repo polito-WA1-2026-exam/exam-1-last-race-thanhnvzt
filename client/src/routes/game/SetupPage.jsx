@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as gameApi from '../../api/gameApi.js';
+import { SubmitButton } from '../../components/controls/SubmitButton.jsx';
 import { NetworkMap } from '../../components/game/NetworkMap.jsx';
 import { LoadingPanel } from '../../components/feedback/LoadingPanel.jsx';
 import { ErrorBanner } from '../../components/feedback/ErrorBanner.jsx';
@@ -110,14 +111,15 @@ export function SetupPage() {
             </ul>
           </div>
 
-          <button
-            className="primary-button setup-start-button"
+          <SubmitButton
+            className="setup-start-button"
             type="button"
             onClick={handleStartGame}
-            disabled={startingGame}
+            isSubmitting={startingGame}
+            loadingLabel="Starting..."
           >
-            {startingGame ? 'Starting...' : 'Start Challenge'}
-          </button>
+            Start Challenge
+          </SubmitButton>
           <ErrorBanner message={startError} />
         </div>
       </div>

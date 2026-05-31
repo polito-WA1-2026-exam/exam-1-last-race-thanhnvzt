@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as gameApi from '../../api/gameApi.js';
+import { SubmitButton } from '../../components/controls/SubmitButton.jsx';
 import { ExecutionTimeline } from '../../components/game/ExecutionTimeline.jsx';
 import { ResultRouteMap } from '../../components/game/ResultRouteMap.jsx';
 import { ScorePanel } from '../../components/game/ScorePanel.jsx';
@@ -122,9 +123,9 @@ export function ResultPage() {
               Show all
             </button>
           )}
-          <button className="primary-button" type="button" onClick={() => navigate('/setup')}>
+          <SubmitButton type="button" onClick={() => navigate('/setup')}>
             New game
-          </button>
+          </SubmitButton>
           <Link to="/ranking">Ranking</Link>
         </div>
       </div>

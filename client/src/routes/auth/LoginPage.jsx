@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as authApi from '../../api/authApi.js';
 import { useAuth } from '../../context/useAuth.js';
+import { SubmitButton } from '../../components/controls/SubmitButton.jsx';
 import { ErrorBanner } from '../../components/feedback/ErrorBanner.jsx';
 
 export function LoginPage() {
@@ -53,9 +54,9 @@ export function LoginPage() {
             onChange={(event) => setPassword(event.target.value)}
           />
         </label>
-        <button className="primary-button" type="submit" disabled={submitting}>
-          {submitting ? 'Logging in...' : 'Login'}
-        </button>
+        <SubmitButton isSubmitting={submitting} loadingLabel="Logging in...">
+          Login
+        </SubmitButton>
       </form>
       <ErrorBanner message={error} />
     </section>
