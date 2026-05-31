@@ -96,7 +96,7 @@
 
 .rule-reminder-list {
   display: grid;
-  gap: 10px;
+  /*gap: 10px;*/
   margin: 0;
   padding-left: 18px;
 }

@@ -105,7 +105,7 @@ export function ResultPage() {
     <section className="page-panel planning-page result-game-page">
       <div className="planning-header">
         <div>
-          <p className="eyebrow">Game #{result.gameId}</p>
+          {/*<p className="eyebrow">Game #{result.gameId}</p>*/}
           <h1>{result.validRoute ? 'Route result' : 'Route failed'}</h1>
         </div>
       </div>

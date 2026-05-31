@@ -215,7 +215,7 @@ export function PlanningPage() {
     <section className="page-panel planning-page">
       <div className="planning-header">
         <div>
-          <p className="eyebrow">Planning game #{planningData.gameId}</p>
+          {/*<p className="eyebrow">Planning game #{planningData.gameId}</p>*/}
           <h1>Build your route</h1>
         </div>
       </div>
