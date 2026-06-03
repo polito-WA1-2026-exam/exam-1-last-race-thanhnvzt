@@ -52,7 +52,8 @@ There is no registration workflow. Users are preloaded in the database.
 
 - The server assigns a random starting station and destination station.
 - The destination must be reachable from the starting station.
-- The minimum distance between start and destination must be at least 3 stops.
+- The minimum distance between start and destination must be at least 3
+  segments.
 - The player sees:
   - a map with station names only, without visible line connections;
   - the assigned start and destination;
@@ -71,6 +72,8 @@ A submitted route is valid only if:
 - every selected step is a real connected pair in the network;
 - consecutive steps are contiguous;
 - line changes happen only at interchange stations.
+- no physical segment is used more than once, even though a station may appear
+  more than once in the route.
 
 The server performs the final validation. The client may prevent obvious errors
 for usability but must not be trusted.
@@ -148,4 +151,3 @@ student's tracking notes if the final version does not clarify them:
 - Should the full event list ever be visible before execution? Current design
   keeps it server-side and sends only chosen events during execution to avoid
   unnecessary data exposure.
-

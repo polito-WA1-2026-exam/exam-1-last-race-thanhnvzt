@@ -45,7 +45,7 @@ Expected:
 | Full network loads for logged user | At least 4 lines, 12 stations, 3 interchanges visible or inferable. |
 | Anonymous cannot fetch setup network | `GET /api/network/setup` returns `401`. |
 | Setup map shows connections | Lines and station connections are visible. |
-| Start game | New game created with start/destination at least 3 stops apart. |
+| Start game | New game created with start/destination at least 3 segments apart. |
 
 ## Planning Tests
 
@@ -71,6 +71,7 @@ Create or choose known routes in the seeded network.
 | Starts from wrong station | invalid, score 0. |
 | Ends before destination | invalid, score 0. |
 | Disconnected segment in middle | invalid, score 0. |
+| Repeated segment ID | invalid, score 0. |
 | Line change at interchange | valid if rest of route is valid. |
 | Line change at non-interchange | invalid, score 0. |
 | Unknown segment ID | `422` JSON error. |

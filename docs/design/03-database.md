@@ -138,7 +138,7 @@ looking up a segment. This avoids duplicates such as `A-B` and `B-A`.
 ### Game Lifecycle
 
 - `createGame(userId)`
-  - Picks a random start and destination at least 3 stops apart.
+  - Picks a random start and destination at least 3 segments apart.
   - Inserts a `planning` game with a 90-second deadline.
 - `getGameForUser(gameId, userId)`
   - Prevents access to another user's game.
@@ -154,7 +154,7 @@ looking up a segment. This avoids duplicates such as `A-B` and `B-A`.
 
 - `seedDatabase()`
   - Optional script or initialization path, depending on repository style.
-- `computeReachablePairsAtLeastDistance(minStops)`
+- `computeReachablePairsAtLeastDistance(minSegments)`
   - Internal helper used by `createGame`.
 
 ## Transactions

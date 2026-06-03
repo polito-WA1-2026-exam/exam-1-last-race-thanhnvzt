@@ -51,7 +51,7 @@ Login form submit
 7. Client calls `API.createGame`.
 8. Server creates a `planning` game:
    - chooses start and destination;
-   - ensures minimum distance of 3 stops;
+   - ensures minimum distance of 3 segments;
    - sets `planningDeadline` to current server time plus 90 seconds.
 9. Client navigates to `/game/:gameId/planning`.
 
@@ -77,8 +77,8 @@ Important distinction:
 ## Phase 4A: Valid Route Execution
 
 1. Server reconstructs the route direction from the assigned start.
-2. Server validates station continuity and line-change rules, then resolves one
-   valid `lineId` for each directed step.
+2. Server validates station continuity, duplicate-segment, and line-change
+   rules, then resolves one valid `lineId` for each directed step.
 3. Server starts from 20 coins.
 4. For each resolved step:
    - choose one random event from `events`;

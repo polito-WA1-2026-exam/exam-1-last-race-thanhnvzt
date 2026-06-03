@@ -187,17 +187,18 @@ segments. Validation must answer two questions:
 
 Recommended server algorithm:
 
-1. Convert selected segment IDs into directed route steps.
-2. Check the first step starts from the assigned start.
-3. Check each next step starts where the previous step ended.
-4. Check the final step ends at the assigned destination.
-5. For each step, load the list of lines serving that segment.
-6. Use dynamic validation over possible current lines:
+1. Reject the route if any segment ID is repeated.
+2. Convert selected segment IDs into directed route steps.
+3. Check the first directed step starts from the assigned start.
+4. Check each next step starts where the previous step ended.
+5. Check the final step ends at the assigned destination.
+6. For each step, load the list of lines serving that segment.
+7. Use dynamic validation over possible current lines:
    - first step can use any line serving that segment;
    - next step can keep the same line if it serves the next segment;
    - next step can switch to another serving line only if the shared station is
      an interchange station served by both the previous line and the new line.
-7. Accept the route if at least one line assignment reaches the final step.
+8. Accept the route if at least one line assignment reaches the final step.
 
 The validation result must include the resolved line assignment, not only a
 boolean. For a valid route, return ordered directed steps with `segmentId`,

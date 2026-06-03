@@ -104,7 +104,7 @@ export function SetupPage() {
             <h2>Challenge Rules</h2>
             <ul className="rule-reminder-list">
               <li>You will receive a random starting station and destination.</li>
-              <li>A minimum distance of at least 3 stops is guaranteed.</li>
+              <li>A minimum distance of at least 3 segments is guaranteed.</li>
               <li>You have 90 seconds to rebuild the route using segment pairs.</li>
               <li>Line changes are only allowed at interchange stations (highlighted white).</li>
               <li>Valid routes earn coins through random transit events.</li>

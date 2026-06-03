@@ -30,7 +30,7 @@ Design implications:
 | --- | ---: | ---: | ---: | --- |
 | Starting coins | 20 | 20 | 20 | Fixed by exam. |
 | Planning duration | 90s | 90s | 90s | Fixed by exam. |
-| Minimum start-destination distance | 3 stops | 3 | `[PLACEHOLDER] 6` | Minimum fixed by exam; max should be tested if assignments feel too hard. |
+| Minimum start-destination distance | 3 segments | 3 | `[PLACEHOLDER] 6` | Minimum fixed by exam; max should be tested if assignments feel too hard. |
 | Event effect | -4 to +4 | -4 | +4 | Fixed range by exam. |
 | Low-time warning threshold | `[PLACEHOLDER] 15s` | 10s | 20s | UI tuning; should create urgency without panic. |
 | Deadline tolerance window | configurable, default 2s | - | - | Server-only tolerance for delayed timeout/manual submissions; configured as `PLANING_TOLERANCE_SECONDS` and not visible extra planning time. |

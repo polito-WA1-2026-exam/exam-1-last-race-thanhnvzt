@@ -76,7 +76,7 @@ Service modules should:
 Responsibilities:
 
 - create a planning game;
-- choose a start and destination at least 3 stops apart;
+- choose a start and destination at least 3 segments apart;
 - return planning data with `planningDeadline` and `serverNow`;
 - submit a route and return either execution data or invalid result data.
 
@@ -88,6 +88,7 @@ Responsibilities:
 - verify route starts at assigned start;
 - verify consecutive continuity;
 - verify final destination;
+- reject repeated physical segments;
 - verify line changes only at interchange stations;
 - resolve one valid `lineId` assignment for every directed step;
 - return a validation result object, not an HTTP response.

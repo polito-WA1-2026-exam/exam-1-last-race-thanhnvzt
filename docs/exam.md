@@ -27,15 +27,15 @@ The application allows users to play multiple games. Each game starts with 20 co
 
 1. **Setup.** The player sees the network map with all stations, their connections, and the lines. When the player is ready to play, they move on to the next phase.
 2. **Planning.** The player sees three elements on the page:
-    1. the network map, showing only the stations with their names but **without** the lines connecting them;
-    2. a starting station and a destination station, randomly assigned by the server, where the destination station must be reachable in the network from the starting station with a minimum distance of at least 3 stops between them;
-    3. the list of all **segments**, that is, pairs of connected stations, for example, Porta Velaria—Fontana Oscura.
+   1. the network map, showing only the stations with their names but **without** the lines connecting them;
+   2. a starting station and a destination station, randomly assigned by the server, where the destination station must be reachable in the network from the starting station with a minimum distance of at least 3 ~~stops~~ segments between them (as an example, Centrale -> Porta Velaria -> Crocevia del Falco -> Piazza delle Lanterne counts as 3 segments, involving 4 stops);
+   3. the list of all **segments**, that is, pairs of connected stations, for example, Porta Velaria—Fontana Oscura.
 
-From the beginning of this phase, the player has 90 seconds to scroll through the list of pairs, mentally reconstruct the network, and build their route by selecting the segments in sequence. The **route** must start from the assigned starting station and end at the assigned destination station.
+From the beginning of this phase, the player has 90 seconds to scroll through the list of pairs, mentally reconstruct the network, and build their route by selecting the segments in sequence. Each segment may be selected only once. The **route** must start from the assigned starting station and end at the assigned destination station.
 
 Before the 90 seconds expire, the player must submit the route they have built. If time runs out, the planning phase automatically ends with the route built up to that point, even if it is incomplete or invalid.
 
-A route is **valid** when it starts and ends at the assigned stations and each segment is reachable through one of the lines, with line changes possible only at interchange stations.
+A route is **valid** when it starts and ends at the assigned stations and each segment is reachable through one of the lines, with line changes possible only at interchange stations. Routes are valid if they involve the same station more than once, but they must not involve any segment more than once.
 
 1. **Execution.** The web application validates the submitted route and, for each segment of the journey, that is, each step from one station to the next, randomly selects one event from those available and applies its effect to the player’s total number of coins. The web application shows the steps one at a time, in sequence, displaying the unexpected event that occurred and the updated coin total.
 
@@ -96,15 +96,15 @@ The project database must be designed by the student and must be pre-populated (
 The README.md file must contain the following information (a template is available in the project repository). Generally, each information item should take no more than 2-3 lines.
 
 1. Server-side:
-    1. A list of the HTTP APIs offered by the server, with a short description of the parameters and the exchanged objects.
-    2. A list of the database tables, with their purpose.
+   1. A list of the HTTP APIs offered by the server, with a short description of the parameters and the exchanged objects.
+   2. A list of the database tables, with their purpose.
 2. Client-side:
-    1. A list of ‘routes’ for the React application, with a short description of the purpose of each route.
-    2. A list of the main React components.
+   1. A list of ‘routes’ for the React application, with a short description of the purpose of each route.
+   2. A list of the main React components.
 3. Overall:
-    1. Two screenshots of the ****application, one **with the general ranking page** and one **during a game**. The screenshot must be embedded in the README by linking the image committed in the project repository.
-    2. Usernames and passwords of the registered users.
-    3. The possible usage of AI during the development of the project, describing for what purpose AI has been used and how their output has been verified and/or adapted. If you didn’t use any AI, please state it.
+   1. Two screenshots of the ****application, one **with the general ranking page** and one **during a game**. The screenshot must be embedded in the README by linking the image committed in the project repository.
+   2. Usernames and passwords of the registered users.
+   3. The possible usage of AI during the development of the project, describing for what purpose AI has been used and how their output has been verified and/or adapted. If you didn’t use any AI, please state it.
 
 ## Submission procedure
 

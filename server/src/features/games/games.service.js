@@ -201,6 +201,18 @@ export async function submitRoute(gameId, userId, segmentIds) {
       });
     }
 
+    const requestedUniqueSegmentIds = new Set(segmentIds);
+    if (segments.length !== requestedUniqueSegmentIds.size) {
+      if (debug) {
+        debug('submission.rejected', {
+          reason: 'unknown-segment',
+          requestedSegmentIds: segmentIds,
+          loadedSegmentIds: segments.map((segment) => segment.id),
+        });
+      }
+      throw new HttpError(422, 'Route contains an unknown segment.');
+    }
+
     const validation = validateRoute({
       game,
       segmentIds,

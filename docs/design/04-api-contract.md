@@ -164,7 +164,9 @@ The server reconstructs the directed route from the assigned start. If the next
 selected segment does not touch the current station, the route is invalid. For a
 valid route, backend validation also resolves the `lineId` used for every step;
 the execution response exposes that resolved line and the same value is stored
-in `game_steps.line_id`.
+in `game_steps.line_id`. The `segmentIds` array must not repeat a physical
+segment; repeated IDs are a processable but invalid route and therefore return
+`200` with `validRoute: false` and score 0.
 
 ### Valid Route Response
 
@@ -206,7 +208,7 @@ in `game_steps.line_id`.
 
 Invalid route submission is a successful game-state transition, so `200` is
 acceptable. Use `422` only when the payload itself cannot be interpreted as a
-route, for example non-array `segmentIds`.
+route, for example non-array, non-integer, or unknown `segmentIds`.
 
 ## Ranking API
 

@@ -8,7 +8,7 @@ validates the route, may select random events, and writes the final score.
 ```txt
 createGame(userId)
 -> load network graph
--> compute pairs with shortest distance >= 3 stops
+-> compute pairs with shortest distance >= 3 segments
 -> randomly choose one pair
 -> startedAt = server now
 -> planningDeadline = startedAt + 90 seconds
@@ -28,6 +28,7 @@ submitRoute(gameId, userId, selectedSegmentIds)
 -> verify status is planning
 -> compare server now with planningDeadline
 -> load selected segments and serving lines
+-> reject repeated segment IDs
 -> reconstruct directed route
 -> validate route rules and resolve line id for each directed step
 -> if invalid or expired: update game with score 0
@@ -44,13 +45,14 @@ matching game steps.
 The client sends segment IDs, not directed station pairs. The server reconstructs
 direction from the assigned start:
 
-1. Set `currentStationId` to `game.startStationId`.
-2. For each selected segment:
+1. Reject the submitted route if any physical segment ID appears more than once.
+2. Set `currentStationId` to `game.startStationId`.
+3. For each selected segment:
    - if `station_a_id` equals current station, direction is A -> B;
    - if `station_b_id` equals current station, direction is B -> A;
    - otherwise the route is disconnected and invalid.
-3. Update `currentStationId` to the step destination.
-4. After all segments, require `currentStationId === destinationStationId`.
+4. Update `currentStationId` to the step destination.
+5. After all segments, require `currentStationId === destinationStationId`.
 
 ## Line-Change Validation
 
@@ -125,6 +127,7 @@ When enabled, the server logs the validation decision path with a
 - selected segment rows and serving line options;
 - directed route reconstruction from the assigned start station;
 - rejected step reasons such as unknown, disconnected, or over-continued route;
+- duplicate segment rejection;
 - line-assignment candidates and whether each transition is accepted by same
   line or interchange;
 - final resolved `lineId` per step for valid routes;

@@ -1,4 +1,4 @@
-const MIN_ROUTE_STOPS = 3;
+const MIN_ROUTE_SEGMENTS = 3;
 
 export function buildNetworkGraph(stations, segments) {
   const graph = new Map(stations.map((station) => [station.id, []]));
@@ -30,7 +30,7 @@ function computeDistances(graph, startStationId) {
   return distances;
 }
 
-export function listEligibleStationPairs(stations, segments, minStops = MIN_ROUTE_STOPS) {
+export function listEligibleStationPairs(stations, segments, minSegments = MIN_ROUTE_SEGMENTS) {
   const graph = buildNetworkGraph(stations, segments);
   const pairs = [];
 
@@ -41,7 +41,7 @@ export function listEligibleStationPairs(stations, segments, minStops = MIN_ROUT
       if (startStation.id === destinationStation.id) continue;
 
       const distance = distances.get(destinationStation.id);
-      if (distance >= minStops) {
+      if (distance >= minSegments) {
         pairs.push({
           startStationId: startStation.id,
           destinationStationId: destinationStation.id,

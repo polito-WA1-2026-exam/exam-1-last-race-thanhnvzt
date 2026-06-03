@@ -52,7 +52,7 @@ route, even though the network is fixed.
 **Output**: Server assigns start station, destination station, planning
 deadline, and initial coins.
 
-**Success Condition**: Destination is reachable and at least 3 stops away.
+**Success Condition**: Destination is reachable and at least 3 segments away.
 
 **Failure State**: If assignments are too short, the challenge is trivial. If
 too long or obscure, the challenge may feel unfair.
@@ -65,8 +65,8 @@ too long or obscure, the challenge may feel unfair.
 
 **Tuning Levers**:
 
-- minimum stop distance: `[PLACEHOLDER] 3`, required by exam;
-- optional maximum stop distance: `[PLACEHOLDER] not set`;
+- minimum segment distance: `[PLACEHOLDER] 3`, required by exam;
+- optional maximum segment distance: `[PLACEHOLDER] not set`;
 - station-pair selection weighting: `[PLACEHOLDER] uniform random`.
 
 **Dependencies**:

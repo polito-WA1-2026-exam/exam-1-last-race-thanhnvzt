@@ -174,6 +174,21 @@ export function validateRoute({ game, segmentIds, segments, stationLineIds, debu
     };
   }
 
+  const duplicateSegmentId = segmentIds.find(
+    (segmentId, index) => segmentIds.indexOf(segmentId) !== index,
+  );
+  if (duplicateSegmentId !== undefined) {
+    writeDebug(debug, 'validation.rejected', {
+      reason: 'duplicate-segment',
+      segmentId: duplicateSegmentId,
+    });
+    return {
+      valid: false,
+      reason: 'Route uses the same segment more than once.',
+      resolvedSteps: [],
+    };
+  }
+
   const segmentsById = new Map(segments.map((segment) => [segment.id, segment]));
   const directedRoute = buildRouteSteps(game, segmentIds, segmentsById, debug);
   if (!directedRoute.valid) {

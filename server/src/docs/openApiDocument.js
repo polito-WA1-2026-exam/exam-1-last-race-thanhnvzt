@@ -59,6 +59,9 @@ export const openApiDocument = {
           segmentIds: {
             type: 'array',
             items: { type: 'integer' },
+            uniqueItems: true,
+            description:
+              'Ordered physical segment IDs selected by the player. Repeated segment IDs produce an invalid route result with score 0.',
             example: [1, 2, 3],
           },
         },
