@@ -1,224 +1,115 @@
-# Last Race
+# Exam #1: "Last Race"
 
-## Student
-
-- Name: Van-Thanh Nguyen
-- ID: s336748
-
-## Project Summary
-
-Last Race is a single-player route-planning game. A registered player studies a
-metro network, receives a random start and destination, and has 90 seconds to
-select an ordered route from station-pair segments. The server validates the
-route, resolves the line used for each step, applies random events, stores the
-score, and exposes a protected ranking.
-
-Anonymous visitors can only read the game instructions. They cannot see the
-network map, segment list, ranking, or game pages.
-
-## How to Run
-
-Install and start the server:
-
-```sh
-cd server
-npm install
-npm run db:reset
-nodemon index.js
-```
-
-If `nodemon` is not available, use:
-
-```sh
-cd server
-npm start
-```
-
-Install and start the client:
-
-```sh
-cd client
-npm install
-npm run dev
-```
-
-Default development URLs:
-
-- Client: `http://localhost:5173`
-- Server API: `http://localhost:3001/api`
-- Debug Swagger UI: `http://localhost:3001/docs`, only when the server runs with
-  `DEBUG_MODE=1` or `npm run debug`
-
-## Debug Mode
-
-Run the backend with debug tools enabled:
-
-```sh
-cd server
-npm run debug
-```
-
-Debug mode enables:
-
-- `/docs` Swagger UI for API exploration;
-- detailed `[game-validation]` server logs for route validation decisions.
-
-To authenticate in Swagger UI, run `POST /api/sessions` first with one of the
-seeded users. The browser stores the `connect.sid` session cookie, and protected
-"Try it out" requests reuse that cookie.
-
-## Users Credentials
-
-
-| User   | Username | Password   | Notes                                     |
-| ------ | -------- | ---------- | ----------------------------------------- |
-| Alice  | `user1`  | `password` | Seeded with one historical game, score 21 |
-| Bianca | `user2`  | `password` | Seeded with one historical game, score 24 |
-| Carlo  | `user3`  | `password` | No historical score initially             |
-
-After `npm run db:reset`, the ranking already contains Bianca and Alice.
+## Student: s336748 NGUYEN VAN-THANH
 
 ## React Client Application Routes
 
-
-| Route                     | Access              | Purpose                                                                                                     |
-| ------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `/`                       | Public              | Instructions page. Does not expose the network map or station data.                                         |
-| `/login`                  | Public              | Login form for seeded registered users.                                                                     |
-| `/setup`                  | Authenticated       | Full network study screen and start-game action.                                                            |
-| `/game/:gameId/planning`  | Authenticated owner | Timed route-planning game screen, route builder, submit confirmation, and result playback after submission. |
-| `/game/:gameId/execution` | Authenticated owner | Compatibility route that redirects to the result screen.                                                    |
-| `/game/:gameId/result`    | Authenticated owner | Reloads a completed game result.                                                                            |
-| `/ranking`                | Authenticated       | Best-score ranking for users with completed games.                                                          |
-| `/404`                    | Public              | Not-found page.                                                                                             |
+- Route `/`: public instructions page. Anonymous visitors can read the game rules but cannot see the network map, ranking, or game data.
+- Route `/login`: login page for registered users. It contains a controlled username/password form.
+- Route `/setup`: protected setup page. It shows the complete underground network with stations, connections, metro lines, and the button to start a game.
+- Route `/game/:gameId/planning`: protected game page for the owner of `gameId`. It shows the station-only map, assigned start/destination, segment list, countdown timer, route selection, and route submission.
+- Route `/game/:gameId/execution`: compatibility route for `gameId`. It redirects to the result page because execution playback is handled there.
+- Route `/game/:gameId/result`: protected result page for the owner of `gameId`. It shows invalid, expired, or executed game results and reloads completed game data from the server.
+- Route `/ranking`: protected general ranking page. It shows the best completed score for each ranked user.
+- Route `*`: not-found page for unknown client-side routes.
 
 ## API Server
 
-All protected endpoints require the Passport session cookie created by
-`POST /api/sessions`.
+- GET `/api/health`
 
+  - request parameters: none
+  - response body: `{ "status": "ok" }`
+- POST `/api/sessions`
 
-| Method   | Endpoint                      | Auth       | Description                                                                                            |
-| -------- | ----------------------------- | ---------- | ------------------------------------------------------------------------------------------------------ |
-| `GET`    | `/api/health`                 | No         | Returns`{ "status": "ok" }`.                                                                           |
-| `POST`   | `/api/sessions`               | No         | Login with`{ "username", "password" }`; creates the session cookie.                                    |
-| `GET`    | `/api/sessions/current`       | Yes        | Returns the logged-in user.                                                                            |
-| `DELETE` | `/api/sessions/current`       | Yes        | Logs out and destroys the session.                                                                     |
-| `GET`    | `/api/network/setup`          | Yes        | Returns full network data for the setup screen.                                                        |
-| `POST`   | `/api/games`                  | Yes        | Creates a planning game with random eligible start/destination.                                        |
-| `GET`    | `/api/games/:gameId/planning` | Yes, owner | Returns station-only planning data, segment pairs, deadline, and assigned stations.                    |
-| `POST`   | `/api/games/:gameId/route`    | Yes, owner | Submits`{ "segmentIds": [...] }`, validates the route, applies events if valid, and stores the result. |
-| `GET`    | `/api/games/:gameId/result`   | Yes, owner | Returns a completed invalid, expired, or executed game result.                                         |
-| `GET`    | `/api/ranking`                | Yes        | Returns best score and completed game count per user.                                                  |
+  - request body: `{ "username": string, "password": string }`
+  - response body: the logged user object `{ "id", "username", "name" }`; the response also creates the Passport session cookie
+- GET `/api/sessions/current`
 
-Important status codes:
+  - request parameters: session cookie
+  - response body: current logged user object `{ "id", "username", "name" }`
+- DELETE `/api/sessions/current`
 
-- `401`: missing or expired session;
-- `403`: game belongs to another user;
-- `404`: game not found;
-- `409`: game is not in the required state, for example already submitted;
-- `422`: malformed route payload such as non-integer `segmentIds`.
+  - request parameters: session cookie
+  - response body: none; the current session is destroyed
+- GET `/api/network/setup`
+
+  - request parameters: session cookie
+  - response body: complete setup network with stations, metro lines, colors, and ordered line segments
+- POST `/api/games`
+
+  - request parameters: session cookie
+  - response body: new planning game with `gameId`, assigned start station, destination station, initial coins, planning deadline, and server time
+- GET `/api/games/:gameId/planning`
+
+  - request parameters: `gameId` path parameter and session cookie
+  - response body: owned planning game data with station-only map data, all selectable segments, assigned start/destination, initial coins, planning deadline, and server time
+- POST `/api/games/:gameId/route`
+
+  - request parameters: `gameId` path parameter and session cookie
+  - request body: `{ "segmentIds": number[] }`, where each id is a selected physical segment in route order
+  - response body: valid execution result with resolved steps and events, or invalid/expired result with score `0`
+- GET `/api/games/:gameId/result`
+
+  - request parameters: `gameId` path parameter and session cookie
+  - response body: completed game result, including persisted steps when the route was valid
+- GET `/api/ranking`
+
+  - request parameters: session cookie
+  - response body: ranking rows with position, user id, username, display name, best score, and completed game count
 
 ## Database Tables
 
-- `users`: registered users with username, display name, password hash, and
-  salt.
-- `stations`: fixed station names and map coordinates.
-- `metro_lines`: fixed line names and colors.
-- `segments`: undirected direct station pairs.
-- `line_segments`: association between metro lines and physical segments.
-- `events`: random event descriptions and coin effects from `-4` to `+4`.
-- `games`: one row per game, including owner, status, start/destination,
-  deadline, submission time, score, and invalid reason.
-- `game_steps`: persisted executed route steps with direction, resolved line,
-  selected event, and coins after the step.
+- Table `users` - contains registered users, display names, usernames, salted password hashes, and salts.
+- Table `stations` - contains the fixed station names and coordinates used to draw the maps.
+- Table `metro_lines` - contains fixed metro line names and colors.
+- Table `segments` - contains undirected direct station pairs; each physical connection is stored once.
+- Table `line_segments` - contains which metro line serves each segment and the segment order within that line.
+- Table `events` - contains random event descriptions and coin effects between `-4` and `+4`.
+- Table `games` - contains each game attempt, owner, status, start station, destination station, deadline, submission time, score, and invalid reason.
+- Table `game_steps` - contains persisted executed steps for valid games, including direction, resolved line, selected event, and coins after the step.
 
 ## Main React Components
 
-- `AppRouter`: declares public and protected SPA routes.
-- `AuthProvider`: restores and stores current session state.
-- `ProtectedRoute`: redirects anonymous visitors away from registered-user
-  screens.
-- `TopNav`: shared navigation and logout action.
-- `InstructionsPage`: public game instructions with no private network data.
-- `LoginPage`: controlled login form.
-- `SetupPage` and `NetworkMap`: complete protected network study screen.
-- `PlanningPage`: timed route builder, route submit confirmation, auto-submit,
-  invalid-result display, and valid-result playback.
-- `StationOnlyMap`: planning/result map with station labels, selected segments,
-  and animated route highlights.
-- `SegmentList`: selectable station-pair list.
-- `CountdownTimer`: visible 90-second planning countdown.
-- `ExecutionTimeline`, `ScorePanel`, and `ResultRouteMap`: result playback and
-  event/score display.
-- `RankingPage` and `RankingTable`: protected ranking view.
-- `SubmitButton`, `LoadingPanel`, `ErrorBanner`, and `EmptyState`: reusable UI
-  controls and feedback states.
-
-## Main Backend Modules
-
-- `server/src/app.js`: Express middleware, Passport/session wiring, route
-  mounting, debug docs, and error handlers.
-- `server/src/features/auth/*`: Passport local strategy, login/logout/current
-  session routes, user DAO, and password verification.
-- `server/src/features/network/*`: protected setup-network API.
-- `server/src/features/games/*`: game creation, graph selection, route
-  validation, scoring, transactions, and result loading.
-- `server/src/features/ranking/*`: ranking query and mapper.
-- `server/src/db/*`: SQLite schema, connection, and seed data.
-- `server/src/docs/*`: debug-only OpenAPI/Swagger documentation.
-
-## Game Rules Implemented
-
-- Setup shows the full network only to authenticated users.
-- Planning hides line paths/colors but shows station names and direct segment
-  pairs.
-- The server assigns start and destination at least 3 stops apart.
-- The visible timer is 90 seconds.
-- Timeout submits the route built so far.
-- The backend accepts submissions within `PLANING_TOLERANCE_SECONDS` after the
-  deadline to absorb network delay; this tolerance is not shown as extra player
-  time.
-- A valid route must start at the assigned start, end at the assigned
-  destination, be ordered continuously, and change lines only at interchange
-  stations.
-- Valid route validation returns the resolved `lineId` for each step.
-- Valid routes receive one random event per step.
-- Invalid or expired routes score 0 and insert no game steps.
-- Ranking shows each user's best completed score.
+- `AppRouter` (in `client/src/router/AppRouter.jsx`): defines the SPA routes and applies protected-route wrappers.
+- `ProtectedRoute` (in `client/src/router/ProtectedRoute.jsx`): prevents anonymous users from opening registered-user pages.
+- `AuthProvider` (in `client/src/context/AuthContext.jsx`): restores the current session and stores login/logout state.
+- `TopNav` (in `client/src/components/layout/TopNav.jsx`): shared navigation bar with login, setup, ranking, and logout actions.
+- `InstructionsPage` (in `client/src/routes/public/InstructionsPage.jsx`): public instructions screen without private network data.
+- `LoginPage` (in `client/src/routes/auth/LoginPage.jsx`): controlled login form and authentication error handling.
+- `SetupPage` (in `client/src/routes/game/SetupPage.jsx`): protected setup screen that loads the full network and starts a new game.
+- `NetworkMap` (in `client/src/components/game/NetworkMap.jsx`): draws the full colored network for the setup phase.
+- `PlanningPage` (in `client/src/routes/game/PlanningPage.jsx`): timed route-building screen with segment selection, confirmation modal, timeout submit, and navigation to result.
+- `StationOnlyMap` (in `client/src/components/game/StationOnlyMap.jsx`): draws station labels and selected route links without exposing line connections during planning.
+- `SegmentList` (in `client/src/components/game/SegmentList.jsx`): displays all selectable station-pair segments and toggles selected segments.
+- `CountdownTimer` (in `client/src/components/game/CountdownTimer.jsx`): displays the 90-second planning countdown using server time synchronization.
+- `ResultPage` (in `client/src/routes/game/ResultPage.jsx`): displays valid, invalid, or expired game results and can reload persisted completed games.
+- `ResultRouteMap` (in `client/src/components/game/ResultRouteMap.jsx`): displays the traveled route with resolved line colors during result playback.
+- `ExecutionTimeline` (in `client/src/components/game/ExecutionTimeline.jsx`): lists executed steps, events, effects, and coin totals.
+- `ScorePanel` (in `client/src/components/game/ScorePanel.jsx`): shows current coins, final score, and active event information.
+- `RankingPage` (in `client/src/routes/ranking/RankingPage.jsx`): loads and displays the protected ranking.
+- `RankingTable` (in `client/src/components/ranking/RankingTable.jsx`): renders ranking rows and highlights the logged user.
 
 ## Screenshot
 
-### Instructions
+General ranking page:
 
-![Instructions page](./img/homepage.png)
+![General ranking page](./img/ranking.png)
 
-### Login
+During a game:
 
-![Login page](./img/login.png)
+![Planning game screen](./img/planning.png)
 
-### Setup
+## Users Credentials
 
-![Setup page](./img/setup.png)
-
-### Planning
-
-![Planning page](./img/planning.png)
-
-### Valid Result
-
-![Valid result page](./img/result_valid.png)
-
-### Invalid Result
-
-![Invalid result page](./img/result_fail.png)
-
-### Ranking
-
-![Ranking page](./img/ranking.png)
+- `user1`, `password` - seeded user with a previous successful game.
+- `user2`, `password` - seeded user with a previous successful game.
+- `user3`, `password` - seeded user without an initial ranking score.
 
 ## Use of AI Tools
 
-AI assistance was used to draft and refine implementation plans, code, design
-documents, debugging notes, and verification checklists. All generated changes
-were reviewed against the project requirements.
+AI tools used during the project were Codex, GPT, and Gemini. Given the
+overall application structure, overall design, and big project layout. The AI
+tools helped write and refine detailed design documents from each requirement,
+then helped implement and debug the code phase by phase. The AI output was
+reviewed and refined in each phase to meet the expected behavior and stay
+aligned with the exam description.
