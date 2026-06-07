@@ -14,10 +14,6 @@ export const SESSION_SECRET =
 export const DATABASE_PATH = process.env.DATABASE_PATH || './db.sqlite';
 export const PLANNING_DURATION_SECONDS = 90;
 export const INITIAL_COINS = 20;
-export const PLANING_TOLERANCE_SECONDS = parseInteger(
-  process.env.PLANING_TOLERANCE_SECONDS,
-  2,
-);
 export const DEBUG_MODE = parseBoolean(process.env.DEBUG_MODE);
 export const DEBUG_GAME_VALIDATION =
   DEBUG_MODE || parseBoolean(process.env.DEBUG_GAME_VALIDATION);

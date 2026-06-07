@@ -18,6 +18,8 @@ export function mapPlanningGame(game, serverNow) {
     planningDeadline: game.planning_deadline,
     serverNow,
     initialCoins: game.initial_coins,
+    draftSegmentIds: JSON.parse(game.planning_draft_segment_ids || '[]'),
+    draftUpdatedAt: game.planning_draft_updated_at,
   };
 }
 

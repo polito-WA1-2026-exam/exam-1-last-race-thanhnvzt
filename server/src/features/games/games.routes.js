@@ -37,11 +37,24 @@ function parseSegmentIds(body) {
   return body.segmentIds;
 }
 
+router.patch('/:gameId/planning-draft', requireAuth, async (req, res, next) => {
+  try {
+    const gameId = parseIntegerParam(req.params.gameId, 'gameId');
+    const segmentIds = parseSegmentIds(req.body);
+    const draft = await gamesService.savePlanningDraft(gameId, req.user.id, segmentIds);
+    res.json(draft);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/:gameId/route', requireAuth, async (req, res, next) => {
   try {
     const gameId = parseIntegerParam(req.params.gameId, 'gameId');
     const segmentIds = parseSegmentIds(req.body);
-    const result = await gamesService.submitRoute(gameId, req.user.id, segmentIds);
+    const result = await gamesService.submitRoute(gameId, req.user.id, segmentIds, {
+      triggeredByTimeout: req.body?.triggeredByTimeout === true,
+    });
     res.json(result);
   } catch (err) {
     next(err);

@@ -101,7 +101,8 @@ Setup response:
 | --- | --- | ---: | --- | --- | --- | --- |
 | POST | `/api/games` | Yes | none | `201` + planning game data | `401`, `500` | `createGame` |
 | GET | `/api/games/:gameId/planning` | Yes | none | `200` + planning data | `400`, `401`, `403`, `404`, `409`, `500` | `listPlanningData` |
-| POST | `/api/games/:gameId/route` | Yes | `{ "segmentIds": [1, 2, 3] }` | `200` + execution/result data | `400`, `401`, `403`, `404`, `409`, `422`, `500` | `submitRoute` |
+| PATCH | `/api/games/:gameId/planning-draft` | Yes | `{ "segmentIds": [1, 2, 3] }` | `200` + saved draft | `400`, `401`, `403`, `404`, `409`, `422`, `500` | `savePlanningDraft` |
+| POST | `/api/games/:gameId/route` | Yes | `{ "segmentIds": [1, 2, 3], "triggeredByTimeout": false }` | `200` + execution/result data | `400`, `401`, `403`, `404`, `409`, `422`, `500` | `submitRoute` |
 | GET | `/api/games/:gameId/result` | Yes | none | `200` + result data | `400`, `401`, `403`, `404`, `500` | `listGameResult` |
 
 ### Create Game Response
@@ -145,20 +146,37 @@ paths. This follows the exam requirement that the planning map shows station
 names but no connecting lines.
 
 `serverNow` is returned with planning responses so the client can compensate for
-small clock differences while rendering the countdown. The server still uses the
-stored `planningDeadline` as the authority when the route is submitted. To avoid
-penalizing honest timeout/manual submissions delayed by HTTP or browser
-scheduling, the backend accepts submissions received within the configured
-`PLANING_TOLERANCE_SECONDS` value after `planningDeadline`; later submissions expire
-the game with score 0. The default is `2` seconds.
+small clock differences while rendering the countdown. The frontend combines it
+with the measured request round-trip time, using the midpoint between request
+start and response receipt as the client reference time. The server still uses
+the stored `planningDeadline` as the authority.
+
+### Save Planning Draft Request
+
+```json
+{
+  "segmentIds": [5, 8, 9]
+}
+```
+
+`PATCH /api/games/:gameId/planning-draft` stores the current route builder state
+for an owned planning game. It returns the saved draft and `serverNow`. The
+server refuses draft updates after the deadline, while the client also stores a
+local copy in `localStorage` for reload recovery.
 
 ### Submit Route Request
 
 ```json
 {
-  "segmentIds": [5, 8, 9, 14]
+  "segmentIds": [5, 8, 9, 14],
+  "triggeredByTimeout": false
 }
 ```
+
+Manual submissions must arrive before the server deadline. Automatic timeout
+submissions set `triggeredByTimeout` to `true`; if they arrive after the
+deadline, the backend validates the latest server-saved draft rather than a new
+late route body.
 
 The server reconstructs the directed route from the assigned start. If the next
 selected segment does not touch the current station, the route is invalid. For a

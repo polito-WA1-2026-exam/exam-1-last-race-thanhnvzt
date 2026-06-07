@@ -56,8 +56,8 @@ Expected:
 | Timer counts down from server deadline | Around 90 seconds at phase start. |
 | Manual submit | Calls route submission endpoint once. |
 | Timeout submit | Automatically submits current route. |
-| Submission arrives within configured tolerance | Backend validates the submitted route normally. |
-| Submission arrives after tolerance | Backend marks the game expired with score 0. |
+| Manual submission arrives after deadline | Backend marks the game expired with score 0. |
+| Timeout submission arrives after deadline | Backend validates the latest server-saved draft. |
 | Duplicate submit click | Second click is disabled or ignored. |
 
 ## Route Validation Tests

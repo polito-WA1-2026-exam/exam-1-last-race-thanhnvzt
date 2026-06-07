@@ -9,6 +9,36 @@ import { SegmentList } from '../../components/game/SegmentList.jsx';
 import { StationOnlyMap } from '../../components/game/StationOnlyMap.jsx';
 import { ErrorBanner } from '../../components/feedback/ErrorBanner.jsx';
 import { LoadingPanel } from '../../components/feedback/LoadingPanel.jsx';
+import {
+  clearLocalPlanningDraft,
+  loadLocalPlanningDraft,
+  saveLocalPlanningDraft,
+} from '../../features/game/planningDraftStorage.js';
+
+function filterKnownSegmentIds(segmentIds, segments) {
+  const availableSegmentIds = new Set(segments.map((segment) => segment.id));
+  return segmentIds.filter((segmentId) => availableSegmentIds.has(segmentId));
+}
+
+function pickInitialDraft(gameId, data) {
+  const serverDraft = {
+    segmentIds: filterKnownSegmentIds(data.draftSegmentIds || [], data.segments),
+    updatedAt: data.draftUpdatedAt,
+  };
+  const localDraft = loadLocalPlanningDraft(gameId);
+
+  if (!localDraft) return serverDraft.segmentIds;
+
+  const localUpdatedAtMs = Date.parse(localDraft.updatedAt || '');
+  const serverUpdatedAtMs = Date.parse(serverDraft.updatedAt || '');
+  const localIsNewer =
+    Number.isFinite(localUpdatedAtMs) &&
+    (!Number.isFinite(serverUpdatedAtMs) || localUpdatedAtMs > serverUpdatedAtMs);
+
+  return localIsNewer
+    ? filterKnownSegmentIds(localDraft.segmentIds, data.segments)
+    : serverDraft.segmentIds;
+}
 
 export function PlanningPage() {
   const navigate = useNavigate();
@@ -34,7 +64,7 @@ export function PlanningPage() {
         const data = await gameApi.getPlanningData(gameId);
         if (!ignore) {
           setPlanningData(data);
-          setSelectedSegmentIds([]);
+          setSelectedSegmentIds(pickInitialDraft(gameId, data));
           setRouteWarning(null);
           setSubmitError(null);
           setSubmitNotice(null);
@@ -75,23 +105,29 @@ export function PlanningPage() {
 
   const editingDisabled = expired || submitting || submitted;
 
+  const persistDraft = useCallback(
+    (nextSegmentIds) => {
+      saveLocalPlanningDraft(gameId, nextSegmentIds);
+      gameApi.savePlanningDraft(gameId, nextSegmentIds).catch(() => {});
+    },
+    [gameId],
+  );
+
   const toggleSegment = useCallback(
     (segmentId) => {
       if (editingDisabled) return;
       setSubmitError(null);
       setSubmitNotice(null);
 
-      setSelectedSegmentIds((currentIds) => {
-        if (currentIds.includes(segmentId)) {
-          setRouteWarning(null);
-          return currentIds.filter((id) => id !== segmentId);
-        }
+      const nextSegmentIds = selectedSegmentIds.includes(segmentId)
+        ? selectedSegmentIds.filter((id) => id !== segmentId)
+        : [...selectedSegmentIds, segmentId];
 
-        setRouteWarning(null);
-        return [...currentIds, segmentId];
-      });
+      setRouteWarning(null);
+      setSelectedSegmentIds(nextSegmentIds);
+      persistDraft(nextSegmentIds);
     },
-    [editingDisabled],
+    [editingDisabled, persistDraft, selectedSegmentIds],
   );
 
   function findSegmentBetweenStations(fromStationId, toStationId) {
@@ -122,6 +158,7 @@ export function PlanningPage() {
     setSubmitError(null);
     setSubmitNotice(null);
     setShowSubmitConfirm(false);
+    persistDraft([]);
   }
 
   const handleSubmitRoute = useCallback(
@@ -150,7 +187,10 @@ export function PlanningPage() {
             : 'Submitting route...',
         );
 
-        const result = await gameApi.submitRoute(gameId, selectedSegmentIds);
+        const result = await gameApi.submitRoute(gameId, selectedSegmentIds, {
+          triggeredByTimeout,
+        });
+        clearLocalPlanningDraft(gameId);
         navigate(`/game/${gameId}/result`, { state: { result } });
       } catch (err) {
         if (err.status === 501) {
@@ -232,6 +272,7 @@ export function PlanningPage() {
         <CountdownTimer
           planningDeadline={planningData.planningDeadline}
           serverNow={planningData.serverNow}
+          serverTimeSync={planningData.serverTimeSync}
           forceExpired={submitted}
           onExpire={handleTimerExpire}
         />

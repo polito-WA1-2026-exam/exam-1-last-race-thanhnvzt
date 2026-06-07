@@ -62,9 +62,10 @@ export async function insertPlanningGame({
         destination_station_id,
         started_at,
         planning_deadline,
+        planning_draft_segment_ids,
         initial_coins
       )
-      VALUES (?, 'planning', ?, ?, ?, ?, ?)`,
+      VALUES (?, 'planning', ?, ?, ?, ?, '[]', ?)`,
       [
         userId,
         startStationId,
@@ -94,6 +95,8 @@ export async function getGameById(gameId) {
         destination_station.name AS destination_station_name,
         g.started_at,
         g.planning_deadline,
+        g.planning_draft_segment_ids,
+        g.planning_draft_updated_at,
         g.initial_coins
       FROM games g
       JOIN stations start_station ON start_station.id = g.start_station_id
@@ -180,6 +183,8 @@ export async function getGameByIdInTransaction(db, gameId) {
       destination_station.name AS destination_station_name,
       g.started_at,
       g.planning_deadline,
+      g.planning_draft_segment_ids,
+      g.planning_draft_updated_at,
       g.initial_coins
     FROM games g
     JOIN stations start_station ON start_station.id = g.start_station_id
@@ -256,6 +261,20 @@ export async function listStationLineIdsInTransaction(db) {
 
 export async function listStationsInTransaction(db) {
   return await db.all('SELECT id, name, x, y FROM stations ORDER BY id');
+}
+
+export async function updatePlanningDraftInTransaction(
+  db,
+  { gameId, segmentIds, updatedAt },
+) {
+  await db.run(
+    `UPDATE games
+    SET
+      planning_draft_segment_ids = ?,
+      planning_draft_updated_at = ?
+    WHERE id = ?`,
+    [JSON.stringify(segmentIds), updatedAt, gameId],
+  );
 }
 
 export async function listEventsInTransaction(db) {

@@ -67,6 +67,8 @@ CREATE TABLE games (
   destination_station_id INTEGER NOT NULL,
   started_at TEXT NOT NULL,
   planning_deadline TEXT NOT NULL,
+  planning_draft_segment_ids TEXT NOT NULL DEFAULT '[]',
+  planning_draft_updated_at TEXT,
   submitted_at TEXT,
   initial_coins INTEGER NOT NULL DEFAULT 20,
   final_coins INTEGER,

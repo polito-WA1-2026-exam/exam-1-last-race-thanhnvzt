@@ -64,6 +64,12 @@ export const openApiDocument = {
               'Ordered physical segment IDs selected by the player. Repeated segment IDs produce an invalid route result with score 0.',
             example: [1, 2, 3],
           },
+          triggeredByTimeout: {
+            type: 'boolean',
+            description:
+              'True when the client countdown reached zero and the automatic timeout submission is being sent.',
+            example: false,
+          },
         },
       },
       GameResult: {
@@ -264,6 +270,51 @@ export const openApiDocument = {
           403: { $ref: '#/components/responses/Forbidden' },
           404: { $ref: '#/components/responses/NotFound' },
           409: { $ref: '#/components/responses/Conflict' },
+        },
+      },
+    },
+    '/api/games/{gameId}/planning-draft': {
+      patch: {
+        tags: ['Games'],
+        summary: 'Save the current planning route draft',
+        security: [{ cookieAuth: [] }],
+        parameters: [
+          {
+            name: 'gameId',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer' },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/SegmentIdList' },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Saved planning draft.',
+            content: {
+              'application/json': {
+                schema: { type: 'object', additionalProperties: true },
+              },
+            },
+          },
+          401: { $ref: '#/components/responses/Unauthorized' },
+          403: { $ref: '#/components/responses/Forbidden' },
+          404: { $ref: '#/components/responses/NotFound' },
+          409: { $ref: '#/components/responses/Conflict' },
+          422: {
+            description: 'Malformed draft payload.',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' },
+              },
+            },
+          },
         },
       },
     },

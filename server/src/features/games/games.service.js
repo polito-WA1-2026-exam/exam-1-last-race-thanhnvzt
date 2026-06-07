@@ -1,7 +1,6 @@
 import {
   DEBUG_GAME_VALIDATION,
   INITIAL_COINS,
-  PLANING_TOLERANCE_SECONDS,
   PLANNING_DURATION_SECONDS,
 } from '../../config/constants.js';
 import { HttpError } from '../../shared/errors.js';
@@ -21,6 +20,7 @@ import {
   listStationsForPlanning,
   markGameExecutedInTransaction,
   markGameInvalidInTransaction,
+  updatePlanningDraftInTransaction,
   withTransaction,
 } from './games.dao.js';
 import {
@@ -84,8 +84,20 @@ export async function getPlanningData(gameId, userId) {
 
 function isSubmissionExpired(game, submittedAt) {
   const deadlineMs = Date.parse(game.planning_deadline);
-  const acceptedUntilMs = deadlineMs + PLANING_TOLERANCE_SECONDS * 1000;
-  return submittedAt.getTime() > acceptedUntilMs;
+  return submittedAt.getTime() > deadlineMs;
+}
+
+function parseStoredDraftSegmentIds(game) {
+  try {
+    const segmentIds = JSON.parse(game.planning_draft_segment_ids || '[]');
+    if (Array.isArray(segmentIds) && segmentIds.every((id) => Number.isInteger(id))) {
+      return segmentIds;
+    }
+  } catch {
+    // Broken draft data should not crash route submission.
+  }
+
+  return [];
 }
 
 function buildValidationDebug(gameId, userId) {
@@ -109,7 +121,44 @@ function enrichScoredSteps(scoredSteps, stationsById, linesById) {
   }));
 }
 
-export async function submitRoute(gameId, userId, segmentIds) {
+export async function savePlanningDraft(gameId, userId, segmentIds) {
+  return await withTransaction(async (db) => {
+    const game = await getGameByIdInTransaction(db, gameId);
+
+    if (!game) {
+      throw new HttpError(404, 'Game not found');
+    }
+
+    if (game.user_id !== userId) {
+      throw new HttpError(403, 'Game belongs to another user');
+    }
+
+    if (game.status !== 'planning') {
+      throw new HttpError(409, 'Game is not in planning state');
+    }
+
+    const updatedAt = new Date();
+    if (isSubmissionExpired(game, updatedAt)) {
+      throw new HttpError(409, 'Planning deadline expired');
+    }
+
+    const updatedAtIso = updatedAt.toISOString();
+    await updatePlanningDraftInTransaction(db, {
+      gameId,
+      segmentIds,
+      updatedAt: updatedAtIso,
+    });
+
+    return {
+      gameId,
+      draftSegmentIds: segmentIds,
+      draftUpdatedAt: updatedAtIso,
+      serverNow: nowIso(),
+    };
+  });
+}
+
+export async function submitRoute(gameId, userId, segmentIds, options = {}) {
   return await withTransaction(async (db) => {
     const debug = buildValidationDebug(gameId, userId);
     const game = await getGameByIdInTransaction(db, gameId);
@@ -133,7 +182,7 @@ export async function submitRoute(gameId, userId, segmentIds) {
         destinationStationId: game.destination_station_id,
         destinationStationName: game.destination_station_name,
         planningDeadline: game.planning_deadline,
-        toleranceSeconds: PLANING_TOLERANCE_SECONDS,
+        triggeredByTimeout: options.triggeredByTimeout === true,
       });
     }
 
@@ -163,14 +212,17 @@ export async function submitRoute(gameId, userId, segmentIds) {
       debug('deadline.checked', {
         submittedAt: submittedAtIso,
         planningDeadline: game.planning_deadline,
-        acceptedUntil: new Date(
-          Date.parse(game.planning_deadline) + PLANING_TOLERANCE_SECONDS * 1000,
-        ).toISOString(),
         expired: isSubmissionExpired(game, submittedAt),
       });
     }
 
-    if (isSubmissionExpired(game, submittedAt)) {
+    const submittedAfterDeadline = isSubmissionExpired(game, submittedAt);
+    const routeSegmentIds =
+      submittedAfterDeadline && options.triggeredByTimeout === true
+        ? parseStoredDraftSegmentIds(game)
+        : segmentIds;
+
+    if (submittedAfterDeadline && options.triggeredByTimeout !== true) {
       const reason = 'Planning deadline expired.';
       if (debug) {
         debug('submission.expired', { reason });
@@ -185,12 +237,13 @@ export async function submitRoute(gameId, userId, segmentIds) {
     }
 
     const [segments, stationLineIds] = await Promise.all([
-      listRouteSegmentsInTransaction(db, segmentIds),
+      listRouteSegmentsInTransaction(db, routeSegmentIds),
       listStationLineIdsInTransaction(db),
     ]);
     if (debug) {
       debug('validation.inputs-loaded', {
-        requestedSegmentIds: segmentIds,
+        requestedSegmentIds: routeSegmentIds,
+        usedStoredDraft: submittedAfterDeadline && options.triggeredByTimeout === true,
         loadedSegments: segments.map((segment) => ({
           id: segment.id,
           stationAId: segment.station_a_id,
@@ -201,12 +254,12 @@ export async function submitRoute(gameId, userId, segmentIds) {
       });
     }
 
-    const requestedUniqueSegmentIds = new Set(segmentIds);
+    const requestedUniqueSegmentIds = new Set(routeSegmentIds);
     if (segments.length !== requestedUniqueSegmentIds.size) {
       if (debug) {
         debug('submission.rejected', {
           reason: 'unknown-segment',
-          requestedSegmentIds: segmentIds,
+          requestedSegmentIds: routeSegmentIds,
           loadedSegmentIds: segments.map((segment) => segment.id),
         });
       }
@@ -215,7 +268,7 @@ export async function submitRoute(gameId, userId, segmentIds) {
 
     const validation = validateRoute({
       game,
-      segmentIds,
+      segmentIds: routeSegmentIds,
       segments,
       stationLineIds,
       debug,

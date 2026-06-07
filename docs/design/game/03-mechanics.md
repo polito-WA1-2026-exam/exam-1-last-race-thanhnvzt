@@ -100,8 +100,9 @@ route is incomplete or invalid, the game scores 0.
 - If route submission fails due to network error, show controlled error.
 - If the browser clock differs from the server, countdown display uses
   `serverNow` offset but server deadline remains authoritative.
-- If an honest submission arrives just after the server deadline because of
-  transport delay, the backend accepts it within the configured tolerance window.
+- If an automatic timeout submission arrives just after the server deadline
+  because of transport delay, the backend validates the latest server-saved
+  planning draft.
 
 **Tuning Levers**:
 
@@ -146,8 +147,7 @@ destination, uses connected segments, and changes lines only at interchanges.
 **Tuning Levers**:
 
 - strictness of post-destination continuation: `[PLACEHOLDER] invalid`;
-- deadline tolerance window: configurable as `PLANING_TOLERANCE_SECONDS`,
-  default `2`;
+- planning draft save frequency: currently every route edit;
 - invalid reason detail level.
 
 **Dependencies**:

@@ -103,8 +103,9 @@ Return `422` for malformed route payloads that cannot be processed. Return
 | Same station appears more than once | allowed if no segment is repeated |
 | Same physical path with reverse direction | invalid because the physical segment is repeated |
 | Submission at or before server deadline | validate route normally |
-| Submission within configured tolerance after server deadline | validate route normally; tolerance only covers transport delay |
-| Submission after `planningDeadline + PLANING_TOLERANCE_SECONDS` | expired, score 0 |
+| Manual submission after server deadline | expired, score 0 |
+| Timeout submission after server deadline | validate the latest server-saved planning draft |
+| Draft save after server deadline | reject with conflict; local storage may still preserve client state |
 
 ## Score Rules
 

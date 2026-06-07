@@ -42,11 +42,16 @@
 - GET `/api/games/:gameId/planning`
 
   - request parameters: `gameId` path parameter and session cookie
-  - response body: owned planning game data with station-only map data, all selectable segments, assigned start/destination, initial coins, planning deadline, and server time
+  - response body: owned planning game data with station-only map data, all selectable segments, assigned start/destination, initial coins, planning deadline, server time, and saved draft route
+- PATCH `/api/games/:gameId/planning-draft`
+
+  - request parameters: `gameId` path parameter and session cookie
+  - request body: `{ "segmentIds": number[] }`, the current draft route in selected order
+  - response body: saved draft route, draft timestamp, and server time
 - POST `/api/games/:gameId/route`
 
   - request parameters: `gameId` path parameter and session cookie
-  - request body: `{ "segmentIds": number[] }`, where each id is a selected physical segment in route order
+  - request body: `{ "segmentIds": number[], "triggeredByTimeout": boolean }`, where each id is a selected physical segment in route order
   - response body: valid execution result with resolved steps and events, or invalid/expired result with score `0`
 - GET `/api/games/:gameId/result`
 

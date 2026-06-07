@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from './client.js';
+import { apiGet, apiGetWithTiming, apiPatch, apiPost } from './client.js';
 
 export function getSetupNetwork() {
   return apiGet('/network/setup');
@@ -9,11 +9,15 @@ export function createGame() {
 }
 
 export function getPlanningData(gameId) {
-  return apiGet(`/games/${gameId}/planning`);
+  return apiGetWithTiming(`/games/${gameId}/planning`);
 }
 
-export function submitRoute(gameId, segmentIds) {
-  return apiPost(`/games/${gameId}/route`, { segmentIds });
+export function savePlanningDraft(gameId, segmentIds) {
+  return apiPatch(`/games/${gameId}/planning-draft`, { segmentIds });
+}
+
+export function submitRoute(gameId, segmentIds, { triggeredByTimeout = false } = {}) {
+  return apiPost(`/games/${gameId}/route`, { segmentIds, triggeredByTimeout });
 }
 
 export function getGameResult(gameId) {

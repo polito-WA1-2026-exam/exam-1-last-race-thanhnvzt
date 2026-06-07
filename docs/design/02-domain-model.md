@@ -83,6 +83,9 @@ One game attempt by one registered user.
 - `destinationStationId`: assigned destination.
 - `startedAt`: game creation timestamp.
 - `planningDeadline`: server timestamp 90 seconds after planning starts.
+- `planningDraftSegmentIds`: JSON array of the latest route draft saved before
+  the deadline.
+- `planningDraftUpdatedAt`: server timestamp for the latest saved draft.
 - `submittedAt`: route submission timestamp.
 - `initialCoins`: always 20.
 - `finalCoins`: raw final coin total before clamping.

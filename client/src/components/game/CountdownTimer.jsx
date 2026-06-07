@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-function computeClientDeadlineMs(planningDeadline, serverNow) {
-  const serverRemainingMs = Date.parse(planningDeadline) - Date.parse(serverNow);
-  return Date.now() + Math.max(0, serverRemainingMs);
+function computeClientDeadlineMs(planningDeadline, serverNow, serverTimeSync) {
+  const serverNowMs = Date.parse(serverNow);
+  const clientReferenceMs = serverTimeSync
+    ? (serverTimeSync.requestStartedAtMs + serverTimeSync.responseReceivedAtMs) / 2
+    : Date.now();
+  const serverOffsetMs = serverNowMs - clientReferenceMs;
+  return Date.parse(planningDeadline) - serverOffsetMs;
 }
 
 function computeRemainingMs(clientDeadlineMs) {
@@ -16,7 +20,13 @@ function formatRemaining(ms) {
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
-export function CountdownTimer({ planningDeadline, serverNow, forceExpired = false, onExpire }) {
+export function CountdownTimer({
+  planningDeadline,
+  serverNow,
+  serverTimeSync,
+  forceExpired = false,
+  onExpire,
+}) {
   const [remainingMs, setRemainingMs] = useState(0);
   const expiredRef = useRef(false);
   const onExpireRef = useRef(onExpire);
@@ -26,7 +36,11 @@ export function CountdownTimer({ planningDeadline, serverNow, forceExpired = fal
   }, [onExpire]);
 
   useEffect(() => {
-    const clientDeadlineMs = computeClientDeadlineMs(planningDeadline, serverNow);
+    const clientDeadlineMs = computeClientDeadlineMs(
+      planningDeadline,
+      serverNow,
+      serverTimeSync,
+    );
     expiredRef.current = false;
 
     function refreshRemaining() {
@@ -50,7 +64,7 @@ export function CountdownTimer({ planningDeadline, serverNow, forceExpired = fal
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [forceExpired, planningDeadline, serverNow]);
+  }, [forceExpired, planningDeadline, serverNow, serverTimeSync]);
 
   const isUrgent = remainingMs <= 10000;
 

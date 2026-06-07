@@ -79,24 +79,31 @@ Recommended navigation:
 
 ## Timer Flow
 
-The server returns `planningDeadline` and `serverNow`.
+The server returns `planningDeadline` and `serverNow`. The API wrapper also
+records `requestStartedAtMs` and `responseReceivedAtMs` for planning data loads.
 
 Client behavior:
 
 1. `CountdownTimer` receives the deadline.
-2. `PlanningPage` computes `serverOffsetMs` from `serverNow`.
+2. `PlanningPage` passes `serverNow` and timing metadata to the timer.
 3. The timer calculates remaining time as:
 
    ```txt
+   serverOffsetMs = Date.parse(serverNow) - ((requestStartedAtMs + responseReceivedAtMs) / 2)
    Date.parse(planningDeadline) - (Date.now() + serverOffsetMs)
    ```
 
 4. It updates once per second.
 5. At zero, it calls `onExpire`.
-6. `PlanningPage` uses the same submit handler used by the manual submit button.
+6. `PlanningPage` uses the same submit handler used by the manual submit button,
+   with `triggeredByTimeout: true`.
 7. A `hasSubmitted` ref or state flag prevents duplicate submissions.
 
 The timer is UI state. The server deadline is the authority.
+
+Every segment toggle or clear action saves the route in backend draft storage
+and browser `localStorage`. On reload, `PlanningPage` prefers the newest local
+or server draft whose segment IDs still exist in the current planning data.
 
 ## Error Handling Flow
 

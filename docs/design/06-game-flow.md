@@ -150,21 +150,32 @@ countdown from those values, but the server remains authoritative.
 Client countdown calculation:
 
 ```txt
-serverOffsetMs = Date.parse(serverNow) - Date.now()
+serverOffsetMs = Date.parse(serverNow) - ((requestStartedAtMs + responseReceivedAtMs) / 2)
 remainingMs = Date.parse(planningDeadline) - (Date.now() + serverOffsetMs)
 ```
 
+The midpoint between request start and response receipt is used as a simple
+round-trip-time estimate. This avoids giving the visible counter the full HTTP
+response latency as extra planning time.
+
+During planning, every route edit is saved in two places:
+
+- a protected backend planning-draft endpoint, so the server has the last route
+  state it received before the deadline;
+- browser `localStorage`, so an unexpected reload can restore the visible
+  route builder state.
+
 When route submission arrives:
 
-- if `submittedAt` is before or equal to `planningDeadline`, process normally;
-- if it arrives after the deadline but within the configured tolerance window,
-  process normally to protect honest submissions delayed by HTTP or browser
-  scheduling;
-- if it arrives after `planningDeadline + PLANING_TOLERANCE_SECONDS`, mark the
-  game `expired` with score 0.
+- if it is a manual submission and `submittedAt` is before or equal to
+  `planningDeadline`, process the submitted route normally;
+- if it is a manual submission after `planningDeadline`, mark the game
+  `expired` with score 0;
+- if it is the automatic timeout submission after `planningDeadline`, process
+  the latest server-saved draft instead of accepting a fresh late route body.
 
 The exam says timeout automatically ends planning with the route built so far.
-That means the client must submit at zero. The server deadline remains the
-authority in case of manipulated clients. `PLANING_TOLERANCE_SECONDS` defaults to
-`2`; it is not extra visible planning time. Once the countdown reaches zero, the
-client disables route editing and sends the current route.
+That means the client submits at zero, but the server deadline remains the
+authority. Once the countdown reaches zero, the client disables route editing and
+sends the timeout submission; if that request is late, the server uses the draft
+already stored before the deadline.

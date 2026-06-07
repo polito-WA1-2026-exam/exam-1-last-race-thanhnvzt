@@ -1,6 +1,7 @@
 const SERVER_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-async function apiRequest(path, options = {}) {
+async function apiRequest(path, options = {}, requestOptions = {}) {
+  const requestStartedAtMs = Date.now();
   const response = await fetch(`${SERVER_URL}${path}`, {
     credentials: 'include',
     headers: {
@@ -9,6 +10,7 @@ async function apiRequest(path, options = {}) {
     },
     ...options,
   });
+  const responseReceivedAtMs = Date.now();
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
@@ -17,12 +19,26 @@ async function apiRequest(path, options = {}) {
     throw error;
   }
 
-  if (response.status === 204) return null;
-  return await response.json();
+  const data = response.status === 204 ? null : await response.json();
+
+  if (!requestOptions.includeTiming) return data;
+
+  return {
+    ...data,
+    serverTimeSync: {
+      requestStartedAtMs,
+      responseReceivedAtMs,
+      roundTripMs: responseReceivedAtMs - requestStartedAtMs,
+    },
+  };
 }
 
 export function apiGet(path) {
   return apiRequest(path);
+}
+
+export function apiGetWithTiming(path) {
+  return apiRequest(path, {}, { includeTiming: true });
 }
 
 export function apiPost(path, body) {
@@ -35,5 +51,12 @@ export function apiPost(path, body) {
 export function apiDelete(path) {
   return apiRequest(path, {
     method: 'DELETE',
+  });
+}
+
+export function apiPatch(path, body) {
+  return apiRequest(path, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
   });
 }
