@@ -74,43 +74,9 @@ Server logs should include enough information to debug:
 
 Do not log passwords or session cookies.
 
-Detailed route-validation logs are disabled by default. Enable them only during
-local debugging with `DEBUG_GAME_VALIDATION=1` or `npm run debug`. The output is
-server-side only and uses the `[game-validation]` prefix so route reconstruction,
-line-change decisions, deadline decisions, draft usage, and scoring can be
-inspected without changing API responses.
-
-## Debug API Documentation
-
-Swagger UI is available only in debug mode:
-
-```sh
-DEBUG_MODE=1 npm start
-# or
-npm run debug
-```
-
-Then open:
-
-```txt
-http://localhost:3001/docs
-```
-
-The `/docs` route is not mounted during normal `npm start` unless
-`DEBUG_MODE=1` is set. This keeps the exam runtime small and avoids exposing
-debug documentation unintentionally.
-
-Authentication in Swagger uses the same Passport session flow as the React app:
-
-1. Open `/docs`.
-2. Run `POST /api/sessions` with a seeded username/password.
-3. The browser receives the `connect.sid` session cookie.
-4. Protected "Try it out" requests reuse that cookie because Swagger UI is
-   configured to include credentials.
-
-The OpenAPI document also declares `cookieAuth` for protected endpoints so the
-authentication requirement is visible in the UI. The API itself still trusts
-only the real server-side session, not a manually typed token.
+Do not add a backend debug action for exam runtime. Validation decisions should
+be inspectable from the route/service/DAO code and from controlled API results,
+without exposing debug-only HTTP documentation or detailed trace logs.
 
 ## Runtime Configuration
 
@@ -121,18 +87,12 @@ PORT=3001
 CLIENT_ORIGIN=http://localhost:5173
 SESSION_SECRET=development-secret-replace-later
 DATABASE_PATH=./db.sqlite
-DEBUG_GAME_VALIDATION=0
-DEBUG_MODE=0
 ```
 
 Defaults may be provided for development, but secrets should be configurable.
 Planning timeout behavior is configured through the fixed 90-second planning
 duration and the stored planning deadline; delayed timeout submissions use the
 last server-saved draft instead of a separate tolerance setting.
-`DEBUG_GAME_VALIDATION` is not secret either, but it should stay off for normal
-runs because it prints detailed game-validation behavior.
-`DEBUG_MODE` enables debug-only tooling such as Swagger UI and should stay off
-for normal submission runs.
 
 ## CORS
 

@@ -140,9 +140,7 @@ Backend:
 - catch expected DAO errors;
 - return JSON errors;
 - log server-side diagnostics with route context;
-- expose detailed route-validation trace logs only when
-  `DEBUG_GAME_VALIDATION=1` or `DEBUG_MODE=1` is enabled;
-- mount `/docs` Swagger UI only when `DEBUG_MODE=1` is enabled;
+- avoid backend debug-only routes or trace actions in the submission runtime;
 - never expose stack traces in JSON responses.
 
 Frontend:

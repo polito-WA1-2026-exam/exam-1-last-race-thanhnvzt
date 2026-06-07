@@ -1,10 +1,8 @@
 import {
-  DEBUG_GAME_VALIDATION,
   INITIAL_COINS,
   PLANNING_DURATION_SECONDS,
 } from '../../config/constants.js';
 import { HttpError } from '../../shared/errors.js';
-import { logGameValidationDebug } from '../../shared/debugLogger.js';
 import { addSeconds, nowIso } from '../../shared/time.js';
 import {
   getGameById,
@@ -100,18 +98,6 @@ function parseStoredDraftSegmentIds(game) {
   return [];
 }
 
-function buildValidationDebug(gameId, userId) {
-  if (!DEBUG_GAME_VALIDATION) return undefined;
-
-  return (event, details = {}) => {
-    logGameValidationDebug(event, {
-      gameId,
-      userId,
-      ...details,
-    });
-  };
-}
-
 function enrichScoredSteps(scoredSteps, stationsById, linesById) {
   return scoredSteps.map((step) => ({
     ...step,
@@ -160,61 +146,22 @@ export async function savePlanningDraft(gameId, userId, segmentIds) {
 
 export async function submitRoute(gameId, userId, segmentIds, options = {}) {
   return await withTransaction(async (db) => {
-    const debug = buildValidationDebug(gameId, userId);
     const game = await getGameByIdInTransaction(db, gameId);
 
     if (!game) {
-      if (debug) {
-        debug('submission.rejected', {
-          reason: 'game-not-found',
-          segmentIds,
-        });
-      }
       throw new HttpError(404, 'Game not found');
     }
 
-    if (debug) {
-      debug('submission.started', {
-        segmentIds,
-        gameStatus: game.status,
-        startStationId: game.start_station_id,
-        startStationName: game.start_station_name,
-        destinationStationId: game.destination_station_id,
-        destinationStationName: game.destination_station_name,
-        planningDeadline: game.planning_deadline,
-        triggeredByTimeout: options.triggeredByTimeout === true,
-      });
-    }
-
     if (game.user_id !== userId) {
-      if (debug) {
-        debug('submission.rejected', {
-          reason: 'wrong-owner',
-          ownerUserId: game.user_id,
-        });
-      }
       throw new HttpError(403, 'Game belongs to another user');
     }
 
     if (game.status !== 'planning') {
-      if (debug) {
-        debug('submission.rejected', {
-          reason: 'not-planning-state',
-          gameStatus: game.status,
-        });
-      }
       throw new HttpError(409, 'Game is not in planning state');
     }
 
     const submittedAt = new Date();
     const submittedAtIso = submittedAt.toISOString();
-    if (debug) {
-      debug('deadline.checked', {
-        submittedAt: submittedAtIso,
-        planningDeadline: game.planning_deadline,
-        expired: isSubmissionExpired(game, submittedAt),
-      });
-    }
 
     const submittedAfterDeadline = isSubmissionExpired(game, submittedAt);
     const routeSegmentIds =
@@ -224,9 +171,6 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
 
     if (submittedAfterDeadline && options.triggeredByTimeout !== true) {
       const reason = 'Planning deadline expired.';
-      if (debug) {
-        debug('submission.expired', { reason });
-      }
       await markGameInvalidInTransaction(db, {
         gameId,
         submittedAt: submittedAtIso,
@@ -240,29 +184,9 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
       listRouteSegmentsInTransaction(db, routeSegmentIds),
       listStationLineIdsInTransaction(db),
     ]);
-    if (debug) {
-      debug('validation.inputs-loaded', {
-        requestedSegmentIds: routeSegmentIds,
-        usedStoredDraft: submittedAfterDeadline && options.triggeredByTimeout === true,
-        loadedSegments: segments.map((segment) => ({
-          id: segment.id,
-          stationAId: segment.station_a_id,
-          stationBId: segment.station_b_id,
-          lineIds: segment.lines.map((line) => line.id),
-        })),
-        stationLineIds,
-      });
-    }
 
     const requestedUniqueSegmentIds = new Set(routeSegmentIds);
     if (segments.length !== requestedUniqueSegmentIds.size) {
-      if (debug) {
-        debug('submission.rejected', {
-          reason: 'unknown-segment',
-          requestedSegmentIds: routeSegmentIds,
-          loadedSegmentIds: segments.map((segment) => segment.id),
-        });
-      }
       throw new HttpError(422, 'Route contains an unknown segment.');
     }
 
@@ -271,15 +195,9 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
       segmentIds: routeSegmentIds,
       segments,
       stationLineIds,
-      debug,
     });
 
     if (!validation.valid) {
-      if (debug) {
-        debug('submission.invalid', {
-          reason: validation.reason,
-        });
-      }
       await markGameInvalidInTransaction(db, {
         gameId,
         submittedAt: submittedAtIso,
@@ -303,14 +221,6 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
     );
 
     const scoring = scoreResolvedSteps(validation.resolvedSteps, events, game.initial_coins);
-    if (debug) {
-      debug('scoring.resolved', {
-        resolvedSteps: validation.resolvedSteps,
-        scoredSteps: scoring.scoredSteps,
-        finalCoins: scoring.finalCoins,
-        score: scoring.score,
-      });
-    }
     await markGameExecutedInTransaction(db, {
       gameId,
       submittedAt: submittedAtIso,
