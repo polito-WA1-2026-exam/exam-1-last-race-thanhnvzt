@@ -3,7 +3,9 @@ import { openDatabase } from '../../db/connection.js';
 export async function listStations() {
   const db = openDatabase();
   try {
-    return await db.all('SELECT id, name, x, y FROM stations ORDER BY id');
+    return await db.all(
+      'SELECT id, name, x, y, is_interchange AS isInterchange FROM stations ORDER BY id',
+    );
   } finally {
     await db.close();
   }
@@ -34,7 +36,9 @@ export async function listLinesWithSegments() {
 export async function listNetworkForSetup() {
   const db = openDatabase();
   try {
-    const stations = await db.all('SELECT id, name, x, y FROM stations ORDER BY id');
+    const stations = await db.all(
+      'SELECT id, name, x, y, is_interchange AS isInterchange FROM stations ORDER BY id',
+    );
     const rows = await db.all(
       `SELECT
         ml.id AS line_id,

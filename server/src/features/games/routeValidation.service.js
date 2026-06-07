@@ -50,11 +50,11 @@ function buildRouteSteps(game, segmentIds, segmentsById) {
   return { valid: true, steps };
 }
 
-function stationServesLine(stationLineIds, stationId, lineId) {
-  return stationLineIds.get(stationId)?.has(lineId) || false;
+function stationAllowsLineChangeOnLine(stationInterchangeLineIds, stationId, lineId) {
+  return stationInterchangeLineIds.get(stationId)?.has(lineId) || false;
 }
 
-function resolveLineAssignments(steps, stationLineIds) {
+function resolveLineAssignments(steps, stationInterchangeLineIds) {
   let paths = steps[0].lineOptions.map((lineId) => [lineId]);
 
   for (let stepIndex = 1; stepIndex < steps.length; stepIndex += 1) {
@@ -67,8 +67,16 @@ function resolveLineAssignments(steps, stationLineIds) {
       for (const nextLineId of nextStep.lineOptions) {
         const sameLine = previousLineId === nextLineId;
         const validInterchange =
-          stationServesLine(stationLineIds, sharedStationId, previousLineId) &&
-          stationServesLine(stationLineIds, sharedStationId, nextLineId);
+          stationAllowsLineChangeOnLine(
+            stationInterchangeLineIds,
+            sharedStationId,
+            previousLineId,
+          ) &&
+          stationAllowsLineChangeOnLine(
+            stationInterchangeLineIds,
+            sharedStationId,
+            nextLineId,
+          );
         const accepted = sameLine || validInterchange;
 
         if (accepted) {
@@ -87,7 +95,12 @@ function resolveLineAssignments(steps, stationLineIds) {
   return paths[0];
 }
 
-export function validateRoute({ game, segmentIds, segments, stationLineIds }) {
+export function validateRoute({
+  game,
+  segmentIds,
+  segments,
+  stationInterchangeLineIds,
+}) {
   if (segmentIds.length === 0) {
     return {
       valid: false,
@@ -96,9 +109,13 @@ export function validateRoute({ game, segmentIds, segments, stationLineIds }) {
     };
   }
 
-  const duplicateSegmentId = segmentIds.find(
-    (segmentId, index) => segmentIds.indexOf(segmentId) !== index,
-  );
+  const seen = new Set();
+  const duplicateSegmentId = segmentIds.find((id) => {
+    if (seen.has(id)) return true;
+    seen.add(id);
+    return false;
+  });
+
   if (duplicateSegmentId !== undefined) {
     return {
       valid: false,
@@ -117,7 +134,10 @@ export function validateRoute({ game, segmentIds, segments, stationLineIds }) {
     };
   }
 
-  const lineAssignments = resolveLineAssignments(directedRoute.steps, stationLineIds);
+  const lineAssignments = resolveLineAssignments(
+    directedRoute.steps,
+    stationInterchangeLineIds,
+  );
   if (!lineAssignments) {
     return {
       valid: false,

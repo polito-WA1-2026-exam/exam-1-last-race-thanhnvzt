@@ -42,11 +42,15 @@ async function seedDatabase() {
 
     const stationIdsByName = new Map();
     for (const station of seedStations) {
-      const result = await db.run('INSERT INTO stations (name, x, y) VALUES (?, ?, ?)', [
-        station.name,
-        station.x,
-        station.y,
-      ]);
+      const result = await db.run(
+        'INSERT INTO stations (name, x, y, is_interchange) VALUES (?, ?, ?, ?)',
+        [
+          station.name,
+          station.x,
+          station.y,
+          station.isInterchange ? 1 : 0,
+        ],
+      );
       stationIdsByName.set(station.name, result.lastID);
     }
 
@@ -152,6 +156,9 @@ async function seedDatabase() {
       stations: await db.get('SELECT COUNT(*) AS count FROM stations'),
       lines: await db.get('SELECT COUNT(*) AS count FROM metro_lines'),
       segments: await db.get('SELECT COUNT(*) AS count FROM segments'),
+      interchanges: await db.get(
+        'SELECT COUNT(*) AS count FROM stations WHERE is_interchange = 1',
+      ),
       events: await db.get('SELECT COUNT(*) AS count FROM events'),
       successfulHistoricalGames: await db.get(
         "SELECT COUNT(*) AS count FROM games WHERE status = 'executed' AND valid_route = 1 AND score > 0",
@@ -163,6 +170,7 @@ async function seedDatabase() {
       stations: summary.stations.count,
       lines: summary.lines.count,
       segments: summary.segments.count,
+      interchanges: summary.interchanges.count,
       events: summary.events.count,
       successfulHistoricalGames: summary.successfulHistoricalGames.count,
     });

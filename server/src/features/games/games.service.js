@@ -12,7 +12,7 @@ import {
   listEventsInTransaction,
   listGameSteps,
   listRouteSegmentsInTransaction,
-  listStationLineIdsInTransaction,
+  listStationInterchangeLineIdsInTransaction,
   listStationsInTransaction,
   listSegmentsForPlanning,
   listStationsForPlanning,
@@ -180,9 +180,9 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
       return mapInvalidRouteResult({ game, status: 'expired', invalidReason: reason });
     }
 
-    const [segments, stationLineIds] = await Promise.all([
+    const [segments, stationInterchangeLineIds] = await Promise.all([
       listRouteSegmentsInTransaction(db, routeSegmentIds),
-      listStationLineIdsInTransaction(db),
+      listStationInterchangeLineIdsInTransaction(db),
     ]);
 
     const requestedUniqueSegmentIds = new Set(routeSegmentIds);
@@ -194,7 +194,7 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
       game,
       segmentIds: routeSegmentIds,
       segments,
-      stationLineIds,
+      stationInterchangeLineIds,
     });
 
     if (!validation.valid) {

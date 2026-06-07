@@ -18,7 +18,7 @@ line-change choices.
 | Station | Gameplay role |
 | --- | --- |
 | Aurora Gate | Red Line endpoint; simple start/destination candidate. |
-| Museum Square | Early Red/Green interchange. |
+| Museum Square | Red/Green crossing where line changes are intentionally not allowed. |
 | Central Spire | Major hub connecting Red, Blue, and Violet. |
 | Harbor Market | Red Line middle station with no interchange. |
 | West Garden | Red/Gold interchange and Red endpoint. |
@@ -39,7 +39,7 @@ for a short memory challenge.
 
 | Line | Stations in order | Design purpose |
 | --- | --- | --- |
-| Red Line | Aurora Gate -> Museum Square -> Central Spire -> Harbor Market -> West Garden | Simple east-west spine with two interchanges and one non-interchange middle step. |
+| Red Line | Aurora Gate -> Museum Square -> Central Spire -> Harbor Market -> West Garden | Simple east-west spine with one non-transfer crossing and two transfer anchors. |
 | Blue Line | North Library -> Central Spire -> Glassworks -> River Forum -> South Arena | Connects the central hub to the lower network and creates several route options. |
 | Green Line | Museum Square -> Old Foundry -> River Forum -> Hill Observatory -> East Depot | Crosses the Red/Blue system and creates memory pressure around Old Foundry and River Forum. |
 | Gold Line | West Garden -> Clocktower -> Glassworks -> East Depot -> South Arena | Provides alternate routes across the right side of the map. |
@@ -52,7 +52,6 @@ shortcuts and line-change decisions without making the map too large.
 
 | Station | Lines | Gameplay reason |
 | --- | --- | --- |
-| Museum Square | Red, Green | Teaches early line changes. |
 | Central Spire | Red, Blue, Violet | Main hub; useful for many start/destination pairs. |
 | West Garden | Red, Gold | Connects Red to the right-side Gold loop. |
 | Glassworks | Blue, Gold | Creates alternate Blue/Gold choices. |
@@ -62,9 +61,10 @@ shortcuts and line-change decisions without making the map too large.
 | East Depot | Green, Gold | Creates route alternatives into the eastern side. |
 | Clocktower | Gold, Violet | Lets players switch between shortcut and Gold routes. |
 
-The exam requires at least 3 interchange stations. This network has 9. That is
-intentional: the core route rule is about line changes at interchanges, so the
-network needs enough interchanges to make that rule matter.
+The exam requires at least 3 interchange stations. This network explicitly marks
+8 stations as interchange stations. Museum Square is served by crossing segments
+but is intentionally not marked as an interchange, giving the validator a real
+invalid line-change case.
 
 ## Segment List
 
@@ -160,14 +160,25 @@ Blue -> Blue -> Gold
 Line change at Glassworks is valid. This is a compact route that demonstrates
 why knowing interchanges improves score potential.
 
+### Invalid non-interchange example
+
+```txt
+Aurora Gate -> Museum Square -> Old Foundry
+```
+
+This tries to change from Red Line to Green Line at Museum Square. Museum Square
+is not an allowed interchange in the seed data, so the backend rejects the route
+with `Route changes lines outside an interchange station.`
+
 ## Balance Notes
 
 - Major hub: Central Spire appears on 3 lines, so it will often be part of valid
   routes. This helps players form a mental anchor.
 - Secondary hubs: Glassworks, River Forum, Old Foundry, Clocktower, and East
   Depot create alternatives away from the main hub.
-- Non-interchange stations such as Harbor Market and Hill Observatory are useful
-  because they create places where line changes should not be allowed.
+- Non-interchange stations such as Museum Square, Harbor Market, and Hill
+  Observatory are useful because they create places where line changes should
+  not be allowed.
 - Endpoint interchanges such as South Arena and East Depot create valid
   destinations that still teach line membership.
 

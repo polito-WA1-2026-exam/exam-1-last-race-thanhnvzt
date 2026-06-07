@@ -68,6 +68,7 @@ Create or choose known routes in the seeded network.
 | --- | --- |
 | Valid direct multi-step route | `validRoute: true`, events generated, score from coin total. |
 | Empty route | `validRoute: false`, score 0. |
+| `Aurora Gate -> Museum Square -> Old Foundry` | invalid line change at Museum Square, score 0. |
 | Starts from wrong station | invalid, score 0. |
 | Ends before destination | invalid, score 0. |
 | Disconnected segment in middle | invalid, score 0. |

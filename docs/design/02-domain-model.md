@@ -23,6 +23,7 @@ A node in the fixed underground network.
 - `id`: stable primary key.
 - `name`: unique station name.
 - `x`, `y`: optional map coordinates for deterministic drawing in the client.
+- `isInterchange`: whether line changes are allowed at this station.
 
 Stations are public only to logged-in users. Anonymous users must not receive
 the station list.
@@ -149,7 +150,6 @@ original implementation.
 
 | Station | Lines |
 | --- | --- |
-| Museum Square | Red, Green |
 | Central Spire | Red, Blue, Violet |
 | West Garden | Red, Gold |
 | Glassworks | Blue, Gold |
@@ -159,8 +159,10 @@ original implementation.
 | East Depot | Green, Gold |
 | Clocktower | Gold, Violet |
 
-The exam requires at least 3 interchange stations. This design has more than 3,
-which makes route planning more interesting while remaining easy to explain.
+The exam requires at least 3 interchange stations. This design has 8 explicit
+interchange stations, which makes route planning more interesting while
+remaining easy to explain. Museum Square is a non-interchange Red/Green crossing
+used to demonstrate an invalid line change.
 
 ## Proposed Events
 

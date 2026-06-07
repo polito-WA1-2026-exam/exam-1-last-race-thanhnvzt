@@ -1,22 +1,5 @@
 
 export function NetworkMap({ stations, lines, height = 480 }) {
-  // Compute interchange stations on the fly
-  const stationLineCounts = {};
-  stations.forEach((s) => {
-    stationLineCounts[s.id] = new Set();
-  });
-
-  lines.forEach((line) => {
-    line.segments.forEach((seg) => {
-      if (stationLineCounts[seg.fromStationId]) {
-        stationLineCounts[seg.fromStationId].add(line.id);
-      }
-      if (stationLineCounts[seg.toStationId]) {
-        stationLineCounts[seg.toStationId].add(line.id);
-      }
-    });
-  });
-
   return (
     <div className="network-map-container">
       <svg
@@ -47,7 +30,7 @@ export function NetworkMap({ stations, lines, height = 480 }) {
 
         {/* Draw Station Nodes */}
         {stations.map((station) => {
-          const isInterchange = stationLineCounts[station.id]?.size > 1;
+          const isInterchange = station.isInterchange;
           return (
             <g key={station.id} className="station-group">
               {isInterchange ? (
