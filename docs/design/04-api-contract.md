@@ -76,19 +76,19 @@ Setup response:
 ```json
 {
   "stations": [
-    { "id": 1, "name": "Aurora Gate", "x": 80, "y": 120 }
+    { "id": 1, "name": "Noi Bai Airport", "x": 310, "y": 50, "isInterchange": false }
   ],
   "lines": [
     {
-      "id": 1,
-      "name": "Red Line",
-      "color": "#d64545",
+      "id": 2,
+      "name": "Line 2 (Ha Dong - Noi Bai)",
+      "color": "#3fae49",
       "stations": [
-        { "id": 1, "name": "Aurora Gate" },
-        { "id": 2, "name": "Museum Square" }
+        { "id": 1, "name": "Noi Bai Airport" },
+        { "id": 2, "name": "Phu Minh" }
       ],
       "segments": [
-        { "id": 1, "fromStationId": 1, "toStationId": 2 }
+        { "id": 8, "fromStationId": 1, "toStationId": 2 }
       ]
     }
   ]
@@ -111,8 +111,8 @@ Setup response:
 {
   "gameId": 42,
   "status": "planning",
-  "startStation": { "id": 3, "name": "Central Spire" },
-  "destinationStation": { "id": 12, "name": "East Depot" },
+  "startStation": { "id": 15, "name": "Troi" },
+  "destinationStation": { "id": 9, "name": "Yen Vien" },
   "planningDeadline": "2026-05-30T12:01:30.000Z",
   "serverNow": "2026-05-30T12:00:00.000Z",
   "initialCoins": 20
@@ -124,18 +124,18 @@ Setup response:
 ```json
 {
   "gameId": 42,
-  "startStation": { "id": 3, "name": "Central Spire" },
-  "destinationStation": { "id": 12, "name": "East Depot" },
+  "startStation": { "id": 15, "name": "Troi" },
+  "destinationStation": { "id": 9, "name": "Yen Vien" },
   "planningDeadline": "2026-05-30T12:01:30.000Z",
   "serverNow": "2026-05-30T12:00:00.000Z",
   "stations": [
-    { "id": 1, "name": "Aurora Gate", "x": 80, "y": 120 }
+    { "id": 1, "name": "Noi Bai Airport", "x": 310, "y": 50, "isInterchange": false }
   ],
   "segments": [
     {
-      "id": 1,
-      "stationA": { "id": 1, "name": "Aurora Gate" },
-      "stationB": { "id": 2, "name": "Museum Square" }
+      "id": 8,
+      "stationA": { "id": 1, "name": "Noi Bai Airport" },
+      "stationB": { "id": 2, "name": "Phu Minh" }
     }
   ]
 }
@@ -199,9 +199,9 @@ segment; repeated IDs are a processable but invalid route and therefore return
   "steps": [
     {
       "index": 0,
-      "fromStation": { "id": 3, "name": "Central Spire" },
-      "toStation": { "id": 7, "name": "Glassworks" },
-      "line": { "id": 2, "name": "Blue Line", "color": "#2f6fde" },
+      "fromStation": { "id": 15, "name": "Troi" },
+      "toStation": { "id": 14, "name": "Nhon" },
+      "line": { "id": 4, "name": "Line 3 (Troi - Nhon - Yen So)", "color": "#d9342b" },
       "event": { "description": "Wrong platform delay", "effect": -2 },
       "coinsAfterStep": 18
     }
@@ -216,7 +216,7 @@ segment; repeated IDs are a processable but invalid route and therefore return
   "gameId": 42,
   "status": "invalid",
   "validRoute": false,
-  "invalidReason": "Route does not reach East Depot.",
+  "invalidReason": "Route changes lines outside an interchange station.",
   "initialCoins": 20,
   "finalCoins": 0,
   "score": 0,

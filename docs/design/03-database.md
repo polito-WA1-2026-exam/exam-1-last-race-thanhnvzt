@@ -199,9 +199,9 @@ scores, where invalid attempts have score 0.
 
 Seed values should follow [Domain Model](./02-domain-model.md#proposed-seed-network):
 
-- 14 stations.
-- 5 lines.
-- at least 3 interchange stations.
+- 18 stations.
+- 6 lines.
+- 5 explicit interchange stations.
 - 9 events.
 - 3 users.
 - historical games for 2 users with positive scores.

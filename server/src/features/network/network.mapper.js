@@ -1,5 +1,9 @@
 export function mapSetupNetwork({ stations, lineSegments }) {
-  const stationsById = new Map(stations.map((station) => [station.id, station]));
+  const mappedStations = stations.map((station) => ({
+    ...station,
+    isInterchange: station.isInterchange === 1,
+  }));
+  const stationsById = new Map(mappedStations.map((station) => [station.id, station]));
   const linesById = new Map();
 
   for (const row of lineSegments) {
@@ -22,7 +26,7 @@ export function mapSetupNetwork({ stations, lineSegments }) {
   }
 
   return {
-    stations,
+    stations: mappedStations,
     lines: [...linesById.values()],
   };
 }

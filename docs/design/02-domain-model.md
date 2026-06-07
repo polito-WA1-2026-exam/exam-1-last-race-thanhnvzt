@@ -121,47 +121,49 @@ original implementation.
 
 ### Stations
 
-1. Aurora Gate
-2. Museum Square
-3. Central Spire
-4. Harbor Market
-5. West Garden
-6. North Library
-7. Glassworks
-8. River Forum
-9. South Arena
-10. Old Foundry
-11. Hill Observatory
-12. East Depot
-13. Clocktower
-14. Canal Court
+1. Noi Bai Airport
+2. Phu Minh
+3. Co Nhue
+4. West Lake
+5. Cau Giay
+6. Cat Linh
+7. Ha Noi Station
+8. Long Bien
+9. Yen Vien
+10. Ngoc Hoi
+11. Giap Bat
+12. Ha Dong
+13. An Khanh
+14. Nhon
+15. Troi
+16. Yen So
+17. Co Loa
+18. Trau Quy
 
 ### Lines
 
 | Line | Stations in order |
 | --- | --- |
-| Red Line | Aurora Gate, Museum Square, Central Spire, Harbor Market, West Garden |
-| Blue Line | North Library, Central Spire, Glassworks, River Forum, South Arena |
-| Green Line | Museum Square, Old Foundry, River Forum, Hill Observatory, East Depot |
-| Gold Line | West Garden, Clocktower, Glassworks, East Depot, South Arena |
-| Violet Line | Canal Court, Old Foundry, Central Spire, Clocktower |
+| Line 1 (Ngoc Hoi - Yen Vien) | Ngoc Hoi, Giap Bat, Ha Noi Station, Long Bien, Yen Vien |
+| Line 2 (Ha Dong - Noi Bai) | Ha Dong, Cau Giay, West Lake, Phu Minh, Noi Bai Airport |
+| Line 2A (Cat Linh - Ha Dong) | Cat Linh, Cau Giay, Ha Dong |
+| Line 3 (Troi - Nhon - Yen So) | Troi, Nhon, Cau Giay, Cat Linh, Ha Noi Station, Yen So |
+| Line 5 (Co Loa - An Khanh) | Co Loa, Long Bien, Ha Noi Station, Cau Giay, An Khanh |
+| Line 8 (Co Nhue - Trau Quy) | Co Nhue, West Lake, Long Bien, Trau Quy |
 
 ### Interchange Stations
 
 | Station | Lines |
 | --- | --- |
-| Central Spire | Red, Blue, Violet |
-| West Garden | Red, Gold |
-| Glassworks | Blue, Gold |
-| River Forum | Blue, Green |
-| South Arena | Blue, Gold |
-| Old Foundry | Green, Violet |
-| East Depot | Green, Gold |
-| Clocktower | Gold, Violet |
+| Cau Giay | Line 2, Line 2A, Line 3, Line 5 |
+| Cat Linh | Line 2A, Line 3 |
+| Ha Noi Station | Line 1, Line 3, Line 5 |
+| Long Bien | Line 1, Line 5, Line 8 |
+| Ha Dong | Line 2, Line 2A |
 
-The exam requires at least 3 interchange stations. This design has 8 explicit
+The exam requires at least 3 interchange stations. This design has 5 explicit
 interchange stations, which makes route planning more interesting while
-remaining easy to explain. Museum Square is a non-interchange Red/Green crossing
+remaining easy to explain. West Lake is a non-interchange Line 2/Line 8 crossing
 used to demonstrate an invalid line change.
 
 ## Proposed Events
