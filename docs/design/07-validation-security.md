@@ -98,8 +98,7 @@ Return `422` for malformed route payloads that cannot be processed. Return
 | Route stops before destination | invalid, score 0 |
 | Route reaches destination then continues | invalid, score 0 unless explicitly rejected earlier |
 | Segment ID does not exist | `422` |
-| Line switch at non-interchange station | invalid, score 0 |
-| Line switch at valid interchange station | allowed |
+| Line switch at shared multi-line station | allowed because interchanges are derived from served line count |
 | Same station appears more than once | allowed if no segment is repeated |
 | Same physical path with reverse direction | invalid because the physical segment is repeated |
 | Submission at or before server deadline | validate route normally |

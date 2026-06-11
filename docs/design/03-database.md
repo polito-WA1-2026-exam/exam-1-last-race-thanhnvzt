@@ -33,8 +33,7 @@ CREATE TABLE stations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL UNIQUE,
   x INTEGER NOT NULL,
-  y INTEGER NOT NULL,
-  is_interchange INTEGER NOT NULL DEFAULT 0 CHECK (is_interchange IN (0, 1))
+  y INTEGER NOT NULL
 );
 
 CREATE TABLE metro_lines (
@@ -132,6 +131,7 @@ looking up a segment. This avoids duplicates such as `A-B` and `B-A`.
 
 - `listNetworkForSetup()`
   - Returns lines, stations, and line-ordered connections for the full setup map.
+  - Derives `isInterchange` for the API from distinct line membership.
 - `listPlanningData(gameId, userId)`
   - Returns station names, assigned start/destination, and segment list.
   - Does not return line connections for the planning map.
@@ -180,14 +180,14 @@ transaction still prevents partial writes if route execution fails.
 ```sql
 SELECT
   u.id AS user_id,
+  u.username,
   u.name,
   MAX(g.score) AS best_score,
   COUNT(g.id) AS completed_games
 FROM users u
 JOIN games g ON g.user_id = u.id
 WHERE g.status IN ('executed', 'invalid', 'expired')
-GROUP BY u.id, u.name
-HAVING completed_games > 0
+GROUP BY u.id, u.username, u.name
 ORDER BY best_score DESC, u.name ASC;
 ```
 
@@ -201,7 +201,7 @@ Seed values should follow [Domain Model](./02-domain-model.md#proposed-seed-netw
 
 - 18 stations.
 - 6 lines.
-- 5 explicit interchange stations.
+- 6 derived interchange stations.
 - 9 events.
 - 3 users.
 - historical games for 2 users with positive scores.

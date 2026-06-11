@@ -140,7 +140,6 @@ destination, uses connected segments, and changes lines only at interchanges.
 - First segment does not touch start.
 - Segment sequence disconnects in the middle.
 - Route reaches destination then continues.
-- Line switch at a non-interchange station.
 - Segment served by multiple lines.
 - Unknown segment id.
 
@@ -154,7 +153,7 @@ destination, uses connected segments, and changes lines only at interchanges.
 
 - segment data;
 - line-segment data;
-- interchange detection;
+- derived interchange detection for setup display;
 - game ownership and status.
 
 ## Mechanic: Journey Events

@@ -56,33 +56,28 @@ direction from the assigned start:
 
 ## Line-Change Validation
 
-Each segment can be served by one or more metro lines. Validation should track
-possible current lines instead of forcing one arbitrary line too early.
+Each segment can be served by one or more metro lines. The current implementation
+keeps the same line when possible and randomly chooses among serving lines when
+a line choice is needed.
 
 Algorithm:
 
 ```txt
-possibleLines = lines serving first step
+currentLine = random line serving first step
 
 for each next step:
   nextLines = lines serving next step
   sharedStation = previous step destination
 
-  allowedNextLines = []
-
-  for previousLine in possibleLines:
-    for nextLine in nextLines:
-      if nextLine === previousLine:
-        allowed
-      else if sharedStation is served by both lines:
-        allowed only because it is an interchange
-
-  possibleLines = allowedNextLines
-  if possibleLines is empty: invalid route
+  if nextLines contains currentLine:
+    keep currentLine
+  else:
+    currentLine = random line serving next step
 ```
 
-The route is valid only if the final step leaves at least one possible line
-assignment.
+Because interchange status is derived from distinct line membership, a connected
+path that changes from one served line to another at the shared station is
+already changing at an interchange by definition.
 
 For a valid route, the validation service must choose one valid line assignment
 and return it as `resolvedSteps`. Each resolved step contains:
@@ -97,11 +92,11 @@ and return it as `resolvedSteps`. Each resolved step contains:
 }
 ```
 
-If multiple line assignments are valid, choose deterministically from the
-remaining possible assignments, for example the lowest `lineId` at the final
-step and the compatible preceding lines. The important rule is that scoring and
-`game_steps` insertion receive already-resolved `lineId` values; they should not
-re-run line-change validation or guess a line later.
+If multiple lines serve a segment and the current line cannot be kept, choose
+one of the serving lines randomly. The important rule is that scoring and
+`game_steps` insertion receive
+already-resolved `lineId` values; they should not re-run line-change validation
+or guess a line later.
 
 - Normal server runs do not print detailed validation traces.
 - Route validation remains explainable through the service and validation
@@ -114,7 +109,8 @@ Key validation decisions to explain during oral defense:
 - directed route reconstruction from the assigned start station;
 - rejected step reasons such as unknown, disconnected, or over-continued route;
 - duplicate segment rejection;
-- line-assignment compatibility by same line or interchange;
+- line assignment: keep the same line when possible, otherwise switch to a
+  random line serving the next segment;
 - final resolved `lineId` per step for valid routes;
 - scoring input and output after route validation.
 

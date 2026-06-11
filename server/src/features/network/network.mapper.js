@@ -1,7 +1,7 @@
 export function mapSetupNetwork({ stations, lineSegments }) {
   const mappedStations = stations.map((station) => ({
     ...station,
-    isInterchange: station.isInterchange === 1,
+    isInterchange: Boolean(station.isInterchange),
   }));
   const stationsById = new Map(mappedStations.map((station) => [station.id, station]));
   const linesById = new Map();

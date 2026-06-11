@@ -25,7 +25,7 @@ to memorize during setup.
 | Noi Bai Airport | Northern endpoint of Line 2. |
 | Phu Minh | Northern Line 2 station near the airport corridor. |
 | Co Nhue | Northwestern endpoint of the simplified Line 8 route. |
-| West Lake | Non-interchange crossing area for Line 2 and Line 8. |
+| West Lake | Interchange between Line 2 and Line 8. |
 | Cau Giay | Western transfer hub for Lines 2, 2A, 3, and 5. |
 | Cat Linh | Transfer between Line 2A and Line 3. |
 | Ha Noi Station | Central railway hub for Lines 1, 3, and 5. |
@@ -67,11 +67,12 @@ full real map's additional stations, monorails, and route branches.
 | Ha Noi Station | Line 1, Line 3, Line 5 | Main rail/metro transfer anchor. |
 | Long Bien | Line 1, Line 5, Line 8 | Eastern river-crossing transfer. |
 | Ha Dong | Line 2, Line 2A | Southwestern transfer/endpoint. |
+| West Lake | Line 2, Line 8 | Northern transfer between airport corridor and Line 8. |
 
-The exam requires at least 3 interchange stations. This network explicitly marks
-5 stations as interchange stations. West Lake is touched by both Line 2 and Line
-8 in the simplified map, but it is intentionally not marked as an interchange,
-giving the validator a concrete invalid line-change case.
+The exam requires at least 3 interchange stations. This network has 6
+interchange stations derived from distinct line membership. The database does
+not store a separate interchange flag, so a station served by more than one line
+automatically behaves as an interchange.
 
 ## Segment List
 
@@ -119,8 +120,8 @@ Station. The line change is valid because Ha Noi Station is an interchange.
 Noi Bai Airport -> Phu Minh -> West Lake -> Cau Giay -> Ha Dong
 ```
 
-This route stays on Line 2. West Lake is non-interchange, but no line change
-happens there, so the route can still be valid.
+This route stays on Line 2, so no line change is needed even though West Lake is
+also served by Line 8.
 
 ### Example 3: Co Loa to An Khanh
 
@@ -131,22 +132,11 @@ Co Loa -> Long Bien -> Ha Noi Station -> Cau Giay -> An Khanh
 This route stays on the corrected Line 5 and matches the real legend endpoint
 name `Co Loa - An Khanh`.
 
-### Invalid Non-Interchange Example
-
-```txt
-Noi Bai Airport -> Phu Minh -> West Lake -> Long Bien
-```
-
-This tries to change from Line 2 to Line 8 at West Lake. West Lake is not an
-allowed interchange in the seed data, so the backend rejects the route with
-`Route changes lines outside an interchange station.`
-
 ## Balance Notes
 
 - Major hubs: Cau Giay, Ha Noi Station, and Long Bien appear on multiple useful
   paths, so they become mental anchors.
-- West Lake remains useful as a memory challenge because it is a crossing but
-  not an allowed interchange.
+- West Lake adds a northern transfer choice between Line 2 and Line 8.
 - Line 5 now has its own Co Loa-An Khanh identity instead of incorrectly acting
   as an Ngoc Hoi connector.
 - Endpoint stations such as Noi Bai Airport, Ngoc Hoi, Yen Vien, An Khanh, Co

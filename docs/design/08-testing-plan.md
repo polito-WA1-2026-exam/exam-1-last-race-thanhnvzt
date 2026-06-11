@@ -68,13 +68,13 @@ Create or choose known routes in the seeded network.
 | --- | --- |
 | Valid direct multi-step route | `validRoute: true`, events generated, score from coin total. |
 | Empty route | `validRoute: false`, score 0. |
-| `Noi Bai Airport -> Phu Minh -> West Lake -> Long Bien` | invalid line change at West Lake, score 0. |
+| `Noi Bai Airport -> Phu Minh -> West Lake -> Long Bien` | valid West Lake transfer if start/destination match. |
 | Starts from wrong station | invalid, score 0. |
 | Ends before destination | invalid, score 0. |
 | Disconnected segment in middle | invalid, score 0. |
 | Repeated segment ID | invalid, score 0. |
 | Line change at interchange | valid if rest of route is valid. |
-| Line change at non-interchange | invalid, score 0. |
+| Line change at non-interchange | normally impossible in the seeded network because interchanges are derived from served line count. |
 | Unknown segment ID | `422` JSON error. |
 | Submit another user's game | `403`. |
 | Submit already submitted game | `409`. |

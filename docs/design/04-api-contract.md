@@ -216,7 +216,7 @@ segment; repeated IDs are a processable but invalid route and therefore return
   "gameId": 42,
   "status": "invalid",
   "validRoute": false,
-  "invalidReason": "Route changes lines outside an interchange station.",
+  "invalidReason": "Route has disconnected segments.",
   "initialCoins": 20,
   "finalCoins": 0,
   "score": 0,

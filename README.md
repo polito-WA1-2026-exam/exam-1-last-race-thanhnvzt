@@ -65,7 +65,7 @@
 ## Database Tables
 
 - Table `users` - contains registered users, display names, usernames, salted password hashes, and salts.
-- Table `stations` - contains fixed station names, map coordinates, and whether the station allows line changes.
+- Table `stations` - contains fixed station names and map coordinates; interchange status is derived from the lines serving each station.
 - Table `metro_lines` - contains fixed metro line names and colors.
 - Table `segments` - contains undirected direct station pairs; each physical connection is stored once.
 - Table `line_segments` - contains which metro line serves each segment and the segment order within that line.

@@ -1,3 +1,5 @@
+import { randomItem } from '../../shared/random.js';
+
 function buildRouteSteps(game, segmentIds, segmentsById) {
   const steps = [];
   let currentStationId = game.start_station_id;
@@ -50,56 +52,28 @@ function buildRouteSteps(game, segmentIds, segmentsById) {
   return { valid: true, steps };
 }
 
-function stationAllowsLineChangeOnLine(stationInterchangeLineIds, stationId, lineId) {
-  return stationInterchangeLineIds.get(stationId)?.has(lineId) || false;
-}
-
-function resolveLineAssignments(steps, stationInterchangeLineIds) {
-  let paths = steps[0].lineOptions.map((lineId) => [lineId]);
+function resolveLineAssignments(steps) {
+  const lineAssignments = [randomItem(steps[0].lineOptions)];
 
   for (let stepIndex = 1; stepIndex < steps.length; stepIndex += 1) {
     const nextStep = steps[stepIndex];
-    const sharedStationId = steps[stepIndex - 1].toStationId;
-    const nextPaths = [];
+    const previousLineId = lineAssignments[stepIndex - 1];
 
-    for (const path of paths) {
-      const previousLineId = path[path.length - 1];
-      for (const nextLineId of nextStep.lineOptions) {
-        const sameLine = previousLineId === nextLineId;
-        const validInterchange =
-          stationAllowsLineChangeOnLine(
-            stationInterchangeLineIds,
-            sharedStationId,
-            previousLineId,
-          ) &&
-          stationAllowsLineChangeOnLine(
-            stationInterchangeLineIds,
-            sharedStationId,
-            nextLineId,
-          );
-        const accepted = sameLine || validInterchange;
-
-        if (accepted) {
-          nextPaths.push([...path, nextLineId]);
-        }
-      }
+    if (nextStep.lineOptions.includes(previousLineId)) {
+      lineAssignments.push(previousLineId);
+      continue;
     }
 
-    if (nextPaths.length === 0) {
-      return null;
-    }
-
-    paths = nextPaths.sort((left, right) => left.join(':').localeCompare(right.join(':')));
+    lineAssignments.push(randomItem(nextStep.lineOptions));
   }
 
-  return paths[0];
+  return lineAssignments;
 }
 
 export function validateRoute({
   game,
   segmentIds,
   segments,
-  stationInterchangeLineIds,
 }) {
   if (segmentIds.length === 0) {
     return {
@@ -134,17 +108,7 @@ export function validateRoute({
     };
   }
 
-  const lineAssignments = resolveLineAssignments(
-    directedRoute.steps,
-    stationInterchangeLineIds,
-  );
-  if (!lineAssignments) {
-    return {
-      valid: false,
-      reason: 'Route changes lines outside an interchange station.',
-      resolvedSteps: [],
-    };
-  }
+  const lineAssignments = resolveLineAssignments(directedRoute.steps);
 
   const resolvedSteps = directedRoute.steps.map((step, index) => ({
     index,

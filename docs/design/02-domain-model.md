@@ -23,7 +23,10 @@ A node in the fixed underground network.
 - `id`: stable primary key.
 - `name`: unique station name.
 - `x`, `y`: optional map coordinates for deterministic drawing in the client.
-- `isInterchange`: whether line changes are allowed at this station.
+
+Interchange status is not stored directly on the station. The backend derives
+it from the fixed network: a station is an interchange when it is served by
+more than one distinct metro line.
 
 Stations are public only to logged-in users. Anonymous users must not receive
 the station list.
@@ -160,11 +163,12 @@ original implementation.
 | Ha Noi Station | Line 1, Line 3, Line 5 |
 | Long Bien | Line 1, Line 5, Line 8 |
 | Ha Dong | Line 2, Line 2A |
+| West Lake | Line 2, Line 8 |
 
-The exam requires at least 3 interchange stations. This design has 5 explicit
+The exam requires at least 3 interchange stations. This design has 6 derived
 interchange stations, which makes route planning more interesting while
-remaining easy to explain. West Lake is a non-interchange Line 2/Line 8 crossing
-used to demonstrate an invalid line change.
+remaining easy to explain. Deriving interchanges from line membership keeps the
+database aligned with the exam definition of an interchange station.
 
 ## Proposed Events
 
@@ -189,8 +193,7 @@ The route is a sequence of station-to-station steps derived from selected
 segments. Validation must answer two questions:
 
 1. Is every step physically connected in the network?
-2. Is there at least one assignment of metro lines to those steps such that line
-   changes occur only at interchange stations?
+2. Which metro line should be recorded for each valid step?
 
 Recommended server algorithm:
 
@@ -200,20 +203,21 @@ Recommended server algorithm:
 4. Check each next step starts where the previous step ended.
 5. Check the final step ends at the assigned destination.
 6. For each step, load the list of lines serving that segment.
-7. Use dynamic validation over possible current lines:
-   - first step can use any line serving that segment;
-   - next step can keep the same line if it serves the next segment;
-   - next step can switch to another serving line only if the shared station is
-     an interchange station served by both the previous line and the new line.
-8. Accept the route if at least one line assignment reaches the final step.
+7. Resolve one line sequence:
+   - first step uses a random line serving that segment;
+   - next step keeps the same line if that line also serves the next segment;
+   - otherwise the next step switches to a random line serving that segment.
+
+Because interchange stations are derived from distinct line membership, a
+connected path that changes lines at a shared station is already changing at an
+interchange by definition.
 
 The validation result must include the resolved line assignment, not only a
 boolean. For a valid route, return ordered directed steps with `segmentId`,
 `fromStationId`, `toStationId`, and the chosen `lineId` for each step. Scoring
 and persistence then consume those resolved steps when inserting `game_steps`
 and building the execution response. This is easier to defend than hardcoding
-line choices in the client, and it handles segments that may be served by
-multiple lines.
+line choices in the client.
 
 ## User Stories
 

@@ -236,42 +236,6 @@ export async function listRouteSegmentsInTransaction(db, segmentIds) {
   return [...segmentsById.values()];
 }
 
-export async function listStationInterchangeLineIdsInTransaction(db) {
-  // Only explicit interchange stations are included; non-interchange crossings
-  // must not allow transfers even if multiple lines touch their segments.
-  const rows = await db.all(
-    `SELECT
-      seg.station_a_id,
-      seg.station_b_id,
-      station_a.is_interchange AS station_a_is_interchange,
-      station_b.is_interchange AS station_b_is_interchange,
-      ls.line_id
-    FROM segments seg
-    JOIN line_segments ls ON ls.segment_id = seg.id
-    JOIN stations station_a ON station_a.id = seg.station_a_id
-    JOIN stations station_b ON station_b.id = seg.station_b_id
-    WHERE station_a.is_interchange = 1 OR station_b.is_interchange = 1`,
-  );
-
-  const stationInterchangeLineIds = new Map();
-  for (const row of rows) {
-    for (const stationId of [row.station_a_id, row.station_b_id]) {
-      const stationKey = stationId === row.station_a_id ? 'station_a_id' : 'station_b_id';
-      const isInterchange = stationKey === 'station_a_id'
-        ? row.station_a_is_interchange === 1
-        : row.station_b_is_interchange === 1;
-      if (!isInterchange) continue;
-
-      if (!stationInterchangeLineIds.has(stationId)) {
-        stationInterchangeLineIds.set(stationId, new Set());
-      }
-      stationInterchangeLineIds.get(stationId).add(row.line_id);
-    }
-  }
-
-  return stationInterchangeLineIds;
-}
-
 export async function listStationsInTransaction(db) {
   return await db.all('SELECT id, name, x, y FROM stations ORDER BY id');
 }

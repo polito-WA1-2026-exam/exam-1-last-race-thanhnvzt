@@ -23,7 +23,6 @@ Validate in services:
 - game is still in `planning`;
 - route starts from assigned station;
 - route ends at assigned destination;
-- line changes happen only at interchanges;
 - submission respects deadline.
 
 ### Database Validation

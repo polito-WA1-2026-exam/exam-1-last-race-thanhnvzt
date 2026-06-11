@@ -89,7 +89,6 @@ Responsibilities:
 - verify consecutive continuity;
 - verify final destination;
 - reject repeated physical segments;
-- verify line changes only at interchange stations;
 - resolve one valid `lineId` assignment for every directed step;
 - return a validation result object, not an HTTP response.
 

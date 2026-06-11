@@ -4,7 +4,27 @@ export async function listStations() {
   const db = openDatabase();
   try {
     return await db.all(
-      'SELECT id, name, x, y, is_interchange AS isInterchange FROM stations ORDER BY id',
+      `SELECT
+        st.id,
+        st.name,
+        st.x,
+        st.y,
+        COALESCE(served.line_count, 0) > 1 AS isInterchange
+      FROM stations st
+      LEFT JOIN (
+        SELECT station_id, COUNT(DISTINCT line_id) AS line_count
+        FROM (
+          SELECT s.station_a_id AS station_id, ls.line_id
+          FROM segments s
+          JOIN line_segments ls ON ls.segment_id = s.id
+          UNION
+          SELECT s.station_b_id AS station_id, ls.line_id
+          FROM segments s
+          JOIN line_segments ls ON ls.segment_id = s.id
+        )
+        GROUP BY station_id
+      ) served ON served.station_id = st.id
+      ORDER BY st.id`,
     );
   } finally {
     await db.close();
@@ -37,7 +57,27 @@ export async function listNetworkForSetup() {
   const db = openDatabase();
   try {
     const stations = await db.all(
-      'SELECT id, name, x, y, is_interchange AS isInterchange FROM stations ORDER BY id',
+      `SELECT
+        st.id,
+        st.name,
+        st.x,
+        st.y,
+        COALESCE(served.line_count, 0) > 1 AS isInterchange
+      FROM stations st
+      LEFT JOIN (
+        SELECT station_id, COUNT(DISTINCT line_id) AS line_count
+        FROM (
+          SELECT s.station_a_id AS station_id, ls.line_id
+          FROM segments s
+          JOIN line_segments ls ON ls.segment_id = s.id
+          UNION
+          SELECT s.station_b_id AS station_id, ls.line_id
+          FROM segments s
+          JOIN line_segments ls ON ls.segment_id = s.id
+        )
+        GROUP BY station_id
+      ) served ON served.station_id = st.id
+      ORDER BY st.id`,
     );
     const rows = await db.all(
       `SELECT

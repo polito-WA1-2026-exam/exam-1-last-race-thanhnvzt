@@ -14,7 +14,6 @@ export async function listRanking() {
       JOIN games g ON g.user_id = u.id
       WHERE g.status IN ('executed', 'invalid', 'expired')
       GROUP BY u.id, u.username, u.name
-      HAVING completed_games > 0
       ORDER BY best_score DESC, u.name ASC`,
     );
   } finally {
