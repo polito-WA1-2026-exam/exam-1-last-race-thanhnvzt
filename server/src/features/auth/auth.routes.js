@@ -38,7 +38,7 @@ router.delete('/current', requireAuth, (req, res, next) => {
     if (err) return next(err);
     return req.session.destroy((destroyErr) => {
       if (destroyErr) return next(destroyErr);
-      res.clearCookie('connect.sid');
+      res.clearCookie('last-race-session');
       return res.status(204).end();
     });
   });
