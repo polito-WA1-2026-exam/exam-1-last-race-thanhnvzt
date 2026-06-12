@@ -1,3 +1,5 @@
+import { GAME_STATUS } from '../../config/constants.js';
+
 export function mapGameResult(result) {
   return result;
 }
@@ -9,15 +11,30 @@ function mapGameStation(row, prefix) {
   };
 }
 
-export function mapPlanningGame(game, serverNow) {
+function mapBaseGameProperties(game) {
   return {
     gameId: game.id,
-    status: game.status,
     startStation: mapGameStation(game, 'start'),
     destinationStation: mapGameStation(game, 'destination'),
+    initialCoins: game.initial_coins,
+  };
+}
+
+function mapRouteStation(station) {
+  return {
+    id: station.id,
+    name: station.name,
+    x: station.x,
+    y: station.y,
+  };
+}
+
+export function mapPlanningGame(game, serverNow) {
+  return {
+    ...mapBaseGameProperties(game),
+    status: game.status,
     planningDeadline: game.planning_deadline,
     serverNow,
-    initialCoins: game.initial_coins,
     draftSegmentIds: JSON.parse(game.planning_draft_segment_ids || '[]'),
     draftUpdatedAt: game.planning_draft_updated_at,
   };
@@ -47,13 +64,10 @@ export function mapPlanningData({ game, stations, segments, serverNow }) {
 
 export function mapInvalidRouteResult({ game, status, invalidReason }) {
   return {
-    gameId: game.id,
+    ...mapBaseGameProperties(game),
     status,
     validRoute: false,
     invalidReason,
-    startStation: mapGameStation(game, 'start'),
-    destinationStation: mapGameStation(game, 'destination'),
-    initialCoins: game.initial_coins,
     finalCoins: 0,
     score: 0,
     steps: [],
@@ -61,23 +75,11 @@ export function mapInvalidRouteResult({ game, status, invalidReason }) {
   };
 }
 
-function mapRouteStation(station) {
-  return {
-    id: station.id,
-    name: station.name,
-    x: station.x,
-    y: station.y,
-  };
-}
-
 export function mapValidRouteResult({ game, stations, scoredSteps, finalCoins, score }) {
   return {
-    gameId: game.id,
-    status: 'executed',
+    ...mapBaseGameProperties(game),
+    status: GAME_STATUS.EXECUTED,
     validRoute: true,
-    startStation: mapGameStation(game, 'start'),
-    destinationStation: mapGameStation(game, 'destination'),
-    initialCoins: game.initial_coins,
     finalCoins,
     score,
     stations,
@@ -107,17 +109,18 @@ export function mapValidRouteResult({ game, stations, scoredSteps, finalCoins, s
 }
 
 export function mapStoredGameResult({ game, stations, steps }) {
-  if (game.status === 'invalid' || game.status === 'expired') {
+  const base = {
+    ...mapBaseGameProperties(game),
+    status: game.status,
+    validRoute: game.valid_route === 1,
+    invalidReason: game.invalid_reason,
+    finalCoins: game.final_coins,
+    score: game.score,
+  };
+
+  if (game.status === GAME_STATUS.INVALID || game.status === GAME_STATUS.EXPIRED) {
     return {
-      gameId: game.id,
-      status: game.status,
-      validRoute: false,
-      invalidReason: game.invalid_reason,
-      startStation: mapGameStation(game, 'start'),
-      destinationStation: mapGameStation(game, 'destination'),
-      initialCoins: game.initial_coins,
-      finalCoins: game.final_coins,
-      score: game.score,
+      ...base,
       stations: [],
       resolvedSteps: [],
       steps: [],
@@ -125,15 +128,7 @@ export function mapStoredGameResult({ game, stations, steps }) {
   }
 
   return {
-    gameId: game.id,
-    status: game.status,
-    validRoute: game.valid_route === 1,
-    invalidReason: game.invalid_reason,
-    startStation: mapGameStation(game, 'start'),
-    destinationStation: mapGameStation(game, 'destination'),
-    initialCoins: game.initial_coins,
-    finalCoins: game.final_coins,
-    score: game.score,
+    ...base,
     stations,
     resolvedSteps: steps.map((step) => ({
       index: step.index,

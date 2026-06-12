@@ -1,6 +1,7 @@
 import {
   INITIAL_COINS,
   PLANNING_DURATION_SECONDS,
+  GAME_STATUS,
 } from '../../config/constants.js';
 import { HttpError } from '../../shared/errors.js';
 import { addSeconds, nowIso } from '../../shared/time.js';
@@ -62,7 +63,7 @@ export async function getPlanningData(gameId, userId) {
     throw new HttpError(403, 'Game belongs to another user');
   }
 
-  if (game.status !== 'planning') {
+  if (game.status !== GAME_STATUS.PLANNING) {
     throw new HttpError(409, 'Game is not in planning state');
   }
 
@@ -118,7 +119,7 @@ export async function savePlanningDraft(gameId, userId, segmentIds) {
       throw new HttpError(403, 'Game belongs to another user');
     }
 
-    if (game.status !== 'planning') {
+    if (game.status !== GAME_STATUS.PLANNING) {
       throw new HttpError(409, 'Game is not in planning state');
     }
 
@@ -155,7 +156,7 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
       throw new HttpError(403, 'Game belongs to another user');
     }
 
-    if (game.status !== 'planning') {
+    if (game.status !== GAME_STATUS.PLANNING) {
       throw new HttpError(409, 'Game is not in planning state');
     }
 
@@ -173,10 +174,10 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
       await markGameInvalidInTransaction(db, {
         gameId,
         submittedAt: submittedAtIso,
-        status: 'expired',
+        status: GAME_STATUS.EXPIRED,
         reason,
       });
-      return mapInvalidRouteResult({ game, status: 'expired', invalidReason: reason });
+      return mapInvalidRouteResult({ game, status: GAME_STATUS.EXPIRED, invalidReason: reason });
     }
 
     const segments = await listRouteSegmentsInTransaction(db, routeSegmentIds);
@@ -196,12 +197,12 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
       await markGameInvalidInTransaction(db, {
         gameId,
         submittedAt: submittedAtIso,
-        status: 'invalid',
+        status: GAME_STATUS.INVALID,
         reason: validation.reason,
       });
       return mapInvalidRouteResult({
         game,
-        status: 'invalid',
+        status: GAME_STATUS.INVALID,
         invalidReason: validation.reason,
       });
     }
@@ -273,13 +274,13 @@ export async function getGameResult(gameId, userId) {
     throw new HttpError(403, 'Game belongs to another user');
   }
 
-  if (game.status === 'planning') {
+  if (game.status === GAME_STATUS.PLANNING) {
     throw new HttpError(409, 'Game is not finished yet');
   }
 
   const [steps, stations] = await Promise.all([
-    game.status === 'executed' ? listGameSteps(gameId) : [],
-    game.status === 'executed' ? listStationsForPlanning() : [],
+    game.status === GAME_STATUS.EXECUTED ? listGameSteps(gameId) : [],
+    game.status === GAME_STATUS.EXECUTED ? listStationsForPlanning() : [],
   ]);
 
   return mapStoredGameResult({

@@ -1,4 +1,5 @@
 import { openDatabase } from '../../db/connection.js';
+import { GAME_STATUS } from '../../config/constants.js';
 
 export async function withTransaction(work) {
   const db = openDatabase();
@@ -65,9 +66,10 @@ export async function insertPlanningGame({
         planning_draft_segment_ids,
         initial_coins
       )
-      VALUES (?, 'planning', ?, ?, ?, ?, '[]', ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, '[]', ?)`,
       [
         userId,
+        GAME_STATUS.PLANNING,
         startStationId,
         destinationStationId,
         startedAt,
@@ -280,14 +282,14 @@ export async function markGameExecutedInTransaction(
   await db.run(
     `UPDATE games
     SET
-      status = 'executed',
+      status = ?,
       submitted_at = ?,
       final_coins = ?,
       score = ?,
       valid_route = 1,
       invalid_reason = NULL
     WHERE id = ?`,
-    [submittedAt, finalCoins, score, gameId],
+    [GAME_STATUS.EXECUTED, submittedAt, finalCoins, score, gameId],
   );
 
   for (const step of scoredSteps) {

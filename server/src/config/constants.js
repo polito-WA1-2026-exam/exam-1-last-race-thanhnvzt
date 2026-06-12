@@ -10,3 +10,10 @@ export const SESSION_SECRET =
 export const DATABASE_PATH = process.env.DATABASE_PATH || './db.sqlite';
 export const PLANNING_DURATION_SECONDS = 90;
 export const INITIAL_COINS = 20;
+
+export const GAME_STATUS = Object.freeze({
+  PLANNING: 'planning',
+  EXECUTED: 'executed',
+  INVALID: 'invalid',
+  EXPIRED: 'expired',
+});
