@@ -1,3 +1,5 @@
+import {randomItem} from "../../shared/random.js";
+
 const MIN_ROUTE_SEGMENTS = 3;
 
 export function buildNetworkGraph(stations, segments) {
@@ -61,5 +63,5 @@ export function pickRandomStationPair(stations, segments) {
     throw new Error('No eligible start/destination pairs found');
   }
 
-  return eligiblePairs[Math.floor(Math.random() * eligiblePairs.length)];
+  return randomItem(eligiblePairs);
 }
