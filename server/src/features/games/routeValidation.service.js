@@ -37,7 +37,7 @@ function buildRouteSteps(game, segmentIds, segmentsById) {
       segmentId: segment.id,
       fromStationId: currentStationId,
       toStationId,
-      lineOptions: segment.lines.map((line) => line.id).sort((a, b) => a - b),
+      lineOptions: segment.lines.map((line) => line.id),
     });
     currentStationId = toStationId;
   }

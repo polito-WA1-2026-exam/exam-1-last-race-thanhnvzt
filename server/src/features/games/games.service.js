@@ -52,9 +52,7 @@ export async function createGame(userId) {
   return mapPlanningGame(game, nowIso());
 }
 
-export async function getPlanningData(gameId, userId) {
-  const game = await getGameById(gameId);
-
+function isGameValid(game,userId){
   if (!game) {
     throw new HttpError(404, 'Game not found');
   }
@@ -62,6 +60,12 @@ export async function getPlanningData(gameId, userId) {
   if (game.user_id !== userId) {
     throw new HttpError(403, 'Game belongs to another user');
   }
+}
+
+export async function getPlanningData(gameId, userId) {
+  const game = await getGameById(gameId);
+
+  isGameValid(game,userId);
 
   if (game.status !== GAME_STATUS.PLANNING) {
     throw new HttpError(409, 'Game is not in planning state');
@@ -111,13 +115,7 @@ export async function savePlanningDraft(gameId, userId, segmentIds) {
   return await withTransaction(async (db) => {
     const game = await getGameByIdInTransaction(db, gameId);
 
-    if (!game) {
-      throw new HttpError(404, 'Game not found');
-    }
-
-    if (game.user_id !== userId) {
-      throw new HttpError(403, 'Game belongs to another user');
-    }
+    isGameValid(game, userId);
 
     if (game.status !== GAME_STATUS.PLANNING) {
       throw new HttpError(409, 'Game is not in planning state');
@@ -148,13 +146,7 @@ export async function submitRoute(gameId, userId, segmentIds, options = {}) {
   return await withTransaction(async (db) => {
     const game = await getGameByIdInTransaction(db, gameId);
 
-    if (!game) {
-      throw new HttpError(404, 'Game not found');
-    }
-
-    if (game.user_id !== userId) {
-      throw new HttpError(403, 'Game belongs to another user');
-    }
+    isGameValid(game, userId);
 
     if (game.status !== GAME_STATUS.PLANNING) {
       throw new HttpError(409, 'Game is not in planning state');
@@ -266,13 +258,7 @@ function mapStepRow(row) {
 export async function getGameResult(gameId, userId) {
   const game = await getResultGameById(gameId);
 
-  if (!game) {
-    throw new HttpError(404, 'Game not found');
-  }
-
-  if (game.user_id !== userId) {
-    throw new HttpError(403, 'Game belongs to another user');
-  }
+    isGameValid(game,userId);
 
   if (game.status === GAME_STATUS.PLANNING) {
     throw new HttpError(409, 'Game is not finished yet');
