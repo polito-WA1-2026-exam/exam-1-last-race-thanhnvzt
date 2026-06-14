@@ -4,6 +4,7 @@ function getSvgPoint(svgElement, event) {
   const point = svgElement.createSVGPoint();
   point.x = event.clientX;
   point.y = event.clientY;
+  // Transforms screen coordinates to match the SVG's coordinate system
   return point.matrixTransform(svgElement.getScreenCTM().inverse());
 }
 

@@ -193,15 +193,10 @@ export function PlanningPage() {
         clearLocalPlanningDraft(gameId);
         navigate(`/game/${gameId}/result`, { state: { result } });
       } catch (err) {
-        if (err.status === 501) {
-          setSubmitNotice(null);
-          setSubmitError(null);
-        } else {
-          setSubmitNotice(null);
-          setSubmitted(false);
-          setExpired(false);
-          setSubmitError(err.message || 'Failed to submit route.');
-        }
+        setSubmitNotice(null);
+        setSubmitted(false);
+        setExpired(false);
+        setSubmitError(err.message || 'Failed to submit route.');
       } finally {
         setSubmitting(false);
       }
