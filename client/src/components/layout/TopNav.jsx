@@ -1,8 +1,8 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth.js';
 import * as authApi from '../../api/authApi.js';
-import { LogoutModal } from "./LogoutModal.jsx";
-import { useState } from "react";
+import { LogoutModal } from './LogoutModal.jsx';
+import { useState } from 'react';
 
 export function TopNav() {
   const { user, setUser } = useAuth();
@@ -10,23 +10,23 @@ export function TopNav() {
 
   const [showLogout, setShowLogout] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const onHideLogout = ()=> setShowLogout(false);
-  const onShowLogout = ()=> setShowLogout(true);
+  const onHideLogout = () => setShowLogout(false);
+  const onShowLogout = () => setShowLogout(true);
 
   async function handleLogout() {
+    if (loggingOut) return;
+
     setLoggingOut(true);
-    try{
-        await authApi.logout();
-    }catch (e) {
-        console.log(e);
-    }finally {
-        setShowLogout(false);
-        setLoggingOut(false);
-        setUser(null);
-        navigate('/');
+    try {
+      await authApi.logout();
+    } catch {
+      // The server may already have dropped the in-memory session.
+    } finally {
+      setShowLogout(false);
+      setLoggingOut(false);
+      setUser(null);
+      navigate('/');
     }
-
-
   }
 
   return (
@@ -50,10 +50,10 @@ export function TopNav() {
         )}
       </nav>
       <LogoutModal
-          show={showLogout}
-          onHide={onHideLogout}
-          onConfirm={handleLogout}
-          loggingOut={loggingOut}
+        show={showLogout}
+        onHide={onHideLogout}
+        onConfirm={handleLogout}
+        loggingOut={loggingOut}
       />
     </header>
 
