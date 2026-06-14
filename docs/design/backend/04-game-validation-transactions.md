@@ -80,7 +80,7 @@ path that changes from one served line to another at the shared station is
 already changing at an interchange by definition.
 
 For a valid route, the validation service must choose one valid line assignment
-and return it as `resolvedSteps`. Each resolved step contains:
+and return it internally as `resolvedSteps`. Each resolved step contains:
 
 ```js
 {
@@ -94,9 +94,10 @@ and return it as `resolvedSteps`. Each resolved step contains:
 
 If multiple lines serve a segment and the current line cannot be kept, choose
 one of the serving lines randomly. The important rule is that scoring and
-`game_steps` insertion receive
-already-resolved `lineId` values; they should not re-run line-change validation
-or guess a line later.
+`game_steps` insertion receive already-resolved `lineId` values; they should not
+re-run line-change validation or guess a line later. The API response then maps
+those internal resolved steps into public `steps` with station, line, event, and
+coin details instead of exposing a duplicate ID-only `resolvedSteps` array.
 
 - Normal server runs do not print detailed validation traces.
 - Route validation remains explainable through the service and validation

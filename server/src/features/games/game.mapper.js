@@ -1,8 +1,5 @@
 import { GAME_STATUS } from '../../config/constants.js';
 
-export function mapGameResult(result) {
-  return result;
-}
 
 function mapGameStation(row, prefix) {
   return {
@@ -71,7 +68,6 @@ export function mapInvalidRouteResult({ game, status, invalidReason }) {
     finalCoins: 0,
     score: 0,
     steps: [],
-    resolvedSteps: [],
   };
 }
 
@@ -83,13 +79,6 @@ export function mapValidRouteResult({ game, stations, scoredSteps, finalCoins, s
     finalCoins,
     score,
     stations,
-    resolvedSteps: scoredSteps.map((step) => ({
-      index: step.index,
-      segmentId: step.segmentId,
-      fromStationId: step.fromStationId,
-      toStationId: step.toStationId,
-      lineId: step.line.id,
-    })),
     steps: scoredSteps.map((step) => ({
       index: step.index,
       fromStation: mapRouteStation(step.fromStation),
@@ -122,7 +111,6 @@ export function mapStoredGameResult({ game, stations, steps }) {
     return {
       ...base,
       stations: [],
-      resolvedSteps: [],
       steps: [],
     };
   }
@@ -130,12 +118,6 @@ export function mapStoredGameResult({ game, stations, steps }) {
   return {
     ...base,
     stations,
-    resolvedSteps: steps.map((step) => ({
-      index: step.index,
-      fromStationId: step.fromStation.id,
-      toStationId: step.toStation.id,
-      lineId: step.line.id,
-    })),
     steps,
   };
 }

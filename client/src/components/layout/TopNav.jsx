@@ -21,7 +21,7 @@ export function TopNav() {
         console.log(e);
     }finally {
         setShowLogout(false);
-        setShowLogout(false);
+        setLoggingOut(false);
         setUser(null);
         navigate('/');
     }

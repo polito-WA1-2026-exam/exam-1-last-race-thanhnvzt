@@ -83,12 +83,14 @@ Setup response:
       "id": 2,
       "name": "Line 2 (Ha Dong - Noi Bai)",
       "color": "#3fae49",
-      "stations": [
-        { "id": 1, "name": "Noi Bai Airport" },
-        { "id": 2, "name": "Phu Minh" }
-      ],
       "segments": [
-        { "id": 8, "fromStationId": 1, "toStationId": 2 }
+        { 
+          "id": 8, 
+          "fromStationId": 1, 
+          "toStationId": 2,
+          "fromStation": { "id": 1, "name": "Noi Bai Airport", "x": 310, "y": 50, "isInterchange": false },
+          "toStation": { "id": 2, "name": "Phu Minh", "x": 350, "y": 100, "isInterchange": false }
+        }
       ]
     }
   ]
@@ -115,7 +117,9 @@ Setup response:
   "destinationStation": { "id": 9, "name": "Yen Vien" },
   "planningDeadline": "2026-05-30T12:01:30.000Z",
   "serverNow": "2026-05-30T12:00:00.000Z",
-  "initialCoins": 20
+  "initialCoins": 20,
+  "draftSegmentIds": [],
+  "draftUpdatedAt": null
 }
 ```
 
@@ -124,10 +128,14 @@ Setup response:
 ```json
 {
   "gameId": 42,
+  "status": "planning",
   "startStation": { "id": 15, "name": "Troi" },
   "destinationStation": { "id": 9, "name": "Yen Vien" },
   "planningDeadline": "2026-05-30T12:01:30.000Z",
   "serverNow": "2026-05-30T12:00:00.000Z",
+  "initialCoins": 20,
+  "draftSegmentIds": [],
+  "draftUpdatedAt": null,
   "stations": [
     { "id": 1, "name": "Noi Bai Airport", "x": 310, "y": 50, "isInterchange": false }
   ],
@@ -160,9 +168,19 @@ the stored `planningDeadline` as the authority.
 ```
 
 `PATCH /api/games/:gameId/planning-draft` stores the current route builder state
-for an owned planning game. It returns the saved draft and `serverNow`. The
-server refuses draft updates after the deadline, while the client also stores a
+for an owned planning game. The server refuses draft updates after the deadline, while the client also stores a
 local copy in `localStorage` for reload recovery.
+
+Response example:
+
+```json
+{
+  "gameId": 42,
+  "draftSegmentIds": [5, 8, 9],
+  "draftUpdatedAt": "2026-05-30T12:00:05.000Z",
+  "serverNow": "2026-05-30T12:00:05.000Z"
+}
+```
 
 ### Submit Route Request
 
@@ -180,11 +198,12 @@ late route body.
 
 The server reconstructs the directed route from the assigned start. If the next
 selected segment does not touch the current station, the route is invalid. For a
-valid route, backend validation also resolves the `lineId` used for every step;
-the execution response exposes that resolved line and the same value is stored
-in `game_steps.line_id`. The `segmentIds` array must not repeat a physical
-segment; repeated IDs are a processable but invalid route and therefore return
-`200` with `validRoute: false` and score 0.
+valid route, backend validation also resolves the `lineId` used for every step.
+The public execution response exposes that resolved line inside each display
+`steps` entry, and the same value is stored in `game_steps.line_id`. The
+`segmentIds` array must not repeat a physical segment; repeated IDs are a
+processable but invalid route and therefore return `200` with
+`validRoute: false` and score 0.
 
 ### Valid Route Response
 
@@ -199,8 +218,8 @@ segment; repeated IDs are a processable but invalid route and therefore return
   "steps": [
     {
       "index": 0,
-      "fromStation": { "id": 15, "name": "Troi" },
-      "toStation": { "id": 14, "name": "Nhon" },
+      "fromStation": { "id": 15, "name": "Troi", "x": 100, "y": 200 },
+      "toStation": { "id": 14, "name": "Nhon", "x": 150, "y": 200 },
       "line": { "id": 4, "name": "Line 3 (Troi - Nhon - Yen So)", "color": "#d9342b" },
       "event": { "description": "Wrong platform delay", "effect": -2 },
       "coinsAfterStep": 18
@@ -242,6 +261,7 @@ Response:
     {
       "position": 1,
       "userId": 2,
+      "username": "user2",
       "name": "Bianca",
       "bestScore": 28,
       "completedGames": 4

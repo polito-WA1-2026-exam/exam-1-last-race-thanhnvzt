@@ -52,7 +52,7 @@
 
   - request parameters: `gameId` path parameter and session cookie
   - request body: `{ "segmentIds": number[], "triggeredByTimeout": boolean }`, where each id is a selected physical segment in route order
-  - response body: valid execution result with resolved steps and events, or invalid/expired result with score `0`
+  - response body: valid execution result with display-ready steps and events, or invalid/expired result with score `0`
 - GET `/api/games/:gameId/result`
 
   - request parameters: `gameId` path parameter and session cookie

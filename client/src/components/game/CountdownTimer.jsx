@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
 function computeClientDeadlineMs(planningDeadline, serverNow, serverTimeSync) {
+  //server actual time
   const serverNowMs = Date.parse(serverNow);
+  // client's estimate clock
   const clientReferenceMs = serverTimeSync
     ? (serverTimeSync.requestStartedAtMs + serverTimeSync.responseReceivedAtMs) / 2
     : Date.now();
+  // the clock difference
   const serverOffsetMs = serverNowMs - clientReferenceMs;
   return Date.parse(planningDeadline) - serverOffsetMs;
 }
